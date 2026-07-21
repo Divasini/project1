@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .chat-wrap { display:flex; height:70vh; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--card); }
+    .conv-list { width:300px; border-right:1px solid var(--border); overflow-y:auto; flex-shrink:0; }
+    .conv-item { padding:14px 16px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:10px; align-items:center; }
+    .conv-item:hover, .conv-item.active { background:rgba(255,255,255,0.05); }
+    .conv-avatar { width:40px; height:40px; border-radius:50%; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; flex-shrink:0; font-size:14px; }
+    .conv-name { font-size:14px; font-weight:600; }
+    .conv-last { font-size:12px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+    .unread-badge { background:var(--accent2); color:#fff; font-size:11px; border-radius:10px; padding:1px 7px; margin-left:auto; }
+    .chat-panel { flex:1; display:flex; flex-direction:column; }
+    .chat-header { padding:14px 18px; border-bottom:1px solid var(--border); font-weight:600; }
+    .chat-messages { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px; }
+    .msg-bubble { max-width:65%; padding:9px 14px; border-radius:14px; font-size:14px; line-height:1.5; }
+    .msg-sent { align-self:flex-end; background:var(--accent-grad); color:#fff; border-bottom-right-radius:4px; }
+    .msg-received { align-self:flex-start; background:rgba(255,255,255,0.08); color:var(--text); border-bottom-left-radius:4px; }
+    .msg-time { font-size:10px; opacity:0.7; margin-top:4px; }
+    .chat-input-row { display:flex; gap:8px; padding:12px; border-top:1px solid var(--border); }
+    .empty-chat { display:flex; flex-direction:column; align-items:center; height:100%; color:var(--text3); padding:20px; }
+
+    /* ── Search-to-start-chat box (pinned to top) ── */
+    .search-box-wrap { position:relative; max-width:320px; width:100%; margin-bottom:0; }
+    .search-results { position:absolute; top:100%; left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; margin-top:6px; max-height:220px; overflow-y:auto; z-index:5; display:none; }
+    .search-result-item { padding:10px 12px; display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .search-result-item:hover { background:rgba(255,255,255,0.06); }
+    .search-avatar-sm { width:32px; height:32px; border-radius:50%; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+
+    .empty-chat-center { display:flex; flex-direction:column; align-items:center; gap:10px; margin:auto 0; color:var(--text3); }
+  </style>
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <button class="hamburger-btn" onclick="toggleMobileNav(this)">☰</button>
+    <div class="nav-menu" id="mobile-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="ideas.html"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+      <a href="forum.html"><i class="fa-solid fa-users"></i> Community</a>
+      <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    </div>
+   <div class="nav-actions">
+  <a href="login.html" class="login-btn">Login</a>
+  <a href="signup.html" class="btn btn-primary">Get Started</a>
+  <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn">🌙</button>
+<a href="messages.html" class="active messages-nav-icon" title="Messages"><i class="fa-solid fa-comments"></i></a></div>
+  </div>
+</nav>
+
+<div class="container section">
+
+  <div class="glass-card mb-4">
+    <h2>💬 Messages</h2>
+    <p class="muted">Chat directly with founders and members.</p>
+  </div>
+
+  <div class="chat-wrap" id="chat-wrap">
+    <!-- LEFT: CONVERSATION LIST -->
+    <div class="conv-list" id="conv-list">
+      <div style="padding:14px;text-align:center;color:var(--text3);font-size:13px;">Loading conversations...</div>
+    </div>
+
+    <!-- RIGHT: CHAT PANEL -->
+    <div class="chat-panel">
+      <div id="empty-chat" class="empty-chat">
+        <div class="search-box-wrap">
+          <input class="form-control" id="user-search-input" placeholder="Search" autocomplete="off">
+          <div class="search-results" id="search-results"></div>
+        </div>
+        <div class="empty-chat-center">
+          <div style="font-size:40px;">💬</div>
+          <p>Select a conversation or search for someone to chat with</p>
+        </div>
+      </div>
+
+      <div id="active-chat" style="display:none;flex-direction:column;height:100%;">
+        <div class="chat-header" id="chat-header">—</div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <input class="form-control" id="msg-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+          <button class="btn btn-primary" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer><p>© 2026 StartupSphere. Built for innovators 🚀</p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script>
+  const API_BASE = "http://localhost:8000";
+  const WS_BASE  = "ws://localhost:8000";
+  const token = localStorage.getItem('ss_token');
+
+  let currentChatUserId = null;
+  let currentChatUserName = null;
+  let socket = null;
+  let myUserId = null;
+
+  if (!token) {
+    window.location.href = 'login.html';
+  }
+
+  function getMyUserId() {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ── Load conversation list ──
+  async function loadConversations() {
+    try {
+      const res = await fetch(`${API_BASE}/messages/conversations`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      const list = document.getElementById('conv-list');
+      if (!res.ok || data.length === 0) {
+        list.innerHTML = '<div style="padding:14px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet.</div>';
+        return;
+      }
+
+      list.innerHTML = data.map(c => {
+        const initials = c.user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        return `
+          <div class="conv-item" data-uid="${c.user.id}" onclick="openChat(${c.user.id}, '${escapeHtml(c.user.name)}')">
+            <div class="conv-avatar">${initials}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="conv-name">${escapeHtml(c.user.name)}</div>
+              <div class="conv-last">${escapeHtml(c.last_message)}</div>
+            </div>
+            ${c.unread_count > 0 ? `<span class="unread-badge">${c.unread_count}</span>` : ''}
+          </div>
+        `;
+      }).join('');
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // ── SEARCH USERS BY NAME ──
+  let searchDebounce = null;
+  document.getElementById('user-search-input').addEventListener('input', function() {
+    clearTimeout(searchDebounce);
+    const q = this.value.trim();
+    const box = document.getElementById('search-results');
+
+    if (q.length < 2) {
+      box.style.display = 'none';
+      box.innerHTML = '';
+      return;
+    }
+
+    searchDebounce = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_BASE}/users/search/query?q=${encodeURIComponent(q)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const users = await res.json();
+
+        if (!res.ok || users.length === 0) {
+          box.innerHTML = '<div style="padding:10px 12px;color:var(--text3);font-size:13px;">No users found.</div>';
+          box.style.display = 'block';
+          return;
+        }
+
+        box.innerHTML = users.map(u => {
+          const initials = u.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+          return `
+            <div class="search-result-item" onclick='selectSearchUser(${u.id}, ${JSON.stringify(u.name)})'>
+              <div class="search-avatar-sm">${initials}</div>
+              <span style="font-size:13px;">${escapeHtml(u.name)}</span>
+            </div>
+          `;
+        }).join('');
+        box.style.display = 'block';
+
+      } catch (err) {
+        console.error(err);
+      }
+    }, 350);
+  });
+
+  function selectSearchUser(userId, userName) {
+    document.getElementById('search-results').style.display = 'none';
+    document.getElementById('user-search-input').value = '';
+    openChat(userId, userName);
+  }
+
+  // Hide dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const wrap = document.querySelector('.search-box-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      document.getElementById('search-results').style.display = 'none';
+    }
+  });
+
+  // ── Open a chat thread ──
+  async function openChat(userId, userName) {
+    currentChatUserId = userId;
+    currentChatUserName = userName;
+
+    document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+    const activeEl = document.querySelector(`.conv-item[data-uid="${userId}"]`);
+    if (activeEl) activeEl.classList.add('active');
+
+    document.getElementById('empty-chat').style.display = 'none';
+    document.getElementById('active-chat').style.display = 'flex';
+    document.getElementById('chat-header').textContent = userName;
+    document.getElementById('chat-messages').innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;">Loading...</div>';
+
+    try {
+      const res = await fetch(`${API_BASE}/messages/${userId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const msgs = await res.json();
+      renderMessages(msgs);
+      loadConversations();
+    } catch (err) {
+      document.getElementById('chat-messages').innerHTML = '<div style="text-align:center;color:#f87171;">Could not load messages.</div>';
+    }
+  }
+
+  function renderMessages(msgs) {
+    const box = document.getElementById('chat-messages');
+    if (msgs.length === 0) {
+      box.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;">No messages yet. Say hi!</div>';
+      return;
+    }
+    box.innerHTML = msgs.map(m => {
+      const isSent = m.sender_id === myUserId;
+      const time = new Date(m.created_at).toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
+      return `
+        <div class="msg-bubble ${isSent ? 'msg-sent' : 'msg-received'}">
+          ${escapeHtml(m.content)}
+          <div class="msg-time">${time}</div>
+        </div>
+      `;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function appendMessage(m) {
+    const box = document.getElementById('chat-messages');
+    const isSent = m.sender_id === myUserId;
+    const time = new Date(m.created_at).toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
+
+    if (box.children.length === 1 && box.textContent.includes('No messages yet')) {
+      box.innerHTML = '';
+    }
+
+    const div = document.createElement('div');
+    div.className = `msg-bubble ${isSent ? 'msg-sent' : 'msg-received'}`;
+    div.innerHTML = `${escapeHtml(m.content)}<div class="msg-time">${time}</div>`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('msg-input');
+    const content = input.value.trim();
+    if (!content || !currentChatUserId) return;
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      alert('Connection lost. Reconnecting...');
+      connectWebSocket();
+      return;
+    }
+
+    socket.send(JSON.stringify({ receiver_id: currentChatUserId, content }));
+    input.value = '';
+  }
+
+  function connectWebSocket() {
+    socket = new WebSocket(`${WS_BASE}/ws/chat?token=${token}`);
+
+    socket.onmessage = (event) => {
+  const m = JSON.parse(event.data);
+
+  if (m.error) {
+    alert(m.error);
+    return;
+  }
+
+  const otherId = m.sender_id === myUserId ? m.receiver_id : m.sender_id;
+  if (otherId === currentChatUserId) {
+    appendMessage(m);
+  }
+  loadConversations();
+};
+
+    socket.onclose = () => {
+      console.log('WebSocket disconnected. Retrying in 3s...');
+      setTimeout(connectWebSocket, 3000);
+    };
+
+    socket.onerror = (err) => {
+      console.error('WebSocket error:', err);
+    };
+  }
+
+  // ── INIT ──
+  myUserId = getMyUserId();
+  loadConversations();
+  connectWebSocket();
+
+  // ── Auto-open chat if arrived here from an idea page ──
+  // Expected link format: messages.html?user=<founder_id>&name=<founder_name>
+  const urlParams = new URLSearchParams(window.location.search);
+  const preUserId = urlParams.get('user');
+  const preUserName = urlParams.get('name');
+  if (preUserId) {
+    openChat(parseInt(preUserId), decodeURIComponent(preUserName || 'User'));
+  }
+</script>
+</body>
+</html>

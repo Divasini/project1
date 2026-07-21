@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <button class="hamburger-btn" onclick="toggleMobileNav(this)">☰</button>
+    <div class="nav-menu" id="mobile-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="ideas.html"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+      <a href="forum.html"><i class="fa-solid fa-users"></i> Community</a>
+      <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <a href="login.html" class="login-btn">Login</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+      <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
+      <a href="messages.html" class="messages-nav-icon" title="Messages"><i class="fa-solid fa-comments"></i></a>
+    </div>
+  </div>
+</nav>
+
+<div class="container section d-flex justify-content-center align-items-center" style="min-height:80vh;">
+  <div class="glass-card" style="width:100%;max-width:460px;animation:fadeUp 0.6s ease both;">
+
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:44px;margin-bottom:12px;"><i class="fa-solid fa-rocket"></i></div>
+      <h2 style="font-size:24px;margin-bottom:6px;">Create Account</h2>
+      <p class="muted">Join 15,000+ innovators on StartupSphere.</p>
+    </div>
+
+    <!-- ERROR / SUCCESS MESSAGE -->
+    <div id="form-message" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;text-align:center;"></div>
+
+    <form id="signup-form">
+      <div class="mb-3">
+        <label>Full Name *</label>
+        <input type="text" class="form-control" id="signup-name" placeholder="Enter your name" required>
+      </div>
+      <div class="mb-3">
+        <label>Email *</label>
+        <input type="email" class="form-control" id="signup-email" placeholder="you@example.com" required>
+      </div>
+      <div class="mb-3">
+        <label>Password *</label>
+        <div style="position:relative;">
+          <input type="password" class="form-control" id="pw1" placeholder="Min. 8 characters" required>
+          <button type="button" id="pw1-toggle" onclick="togglePw1()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden;">
+          <div id="strength-bar" style="height:100%;width:0%;background:var(--accent-grad);border-radius:2px;transition:width 0.3s;"></div>
+        </div>
+        <div id="strength-text" style="font-size:11px;color:var(--text3);margin-top:4px;"></div>
+      </div>
+      <div class="mb-3">
+        <label>Confirm Password *</label>
+        <input type="password" class="form-control" id="pw2" placeholder="Re-enter password" required>
+      </div>
+      <div class="mb-3" style="display:flex;align-items:flex-start;gap:8px;">
+        <input type="checkbox" id="terms" style="accent-color:var(--accent);margin-top:2px;" required>
+        <label for="terms" style="margin:0;font-size:13px;color:var(--text2);cursor:pointer;line-height:1.5;">
+          I agree to the <a href="#" style="color:var(--accent2);">Terms of Service</a> and <a href="#" style="color:var(--accent2);">Privacy Policy</a>
+        </label>
+      </div>
+      <button type="button" class="btn btn-primary w-100" style="padding:12px;font-size:15px;" id="signup-btn" onclick="doSignup(this)">
+        <i class="fa-solid fa-rocket"></i> Create Account
+      </button>
+    </form>
+
+    <p style="text-align:center;margin-top:20px;font-size:13px;color:var(--text3);">
+      Already have an account? <a href="login.html" style="color:var(--accent2);">Sign in</a>
+    </p>
+
+  </div>
+</div>
+
+<footer><p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script>
+  // ── Backend API base URL ──
+  const API_BASE = "http://localhost:8000";
+
+  // ── Password visibility toggle ──
+  function togglePw1() {
+    const input = document.getElementById('pw1');
+    const icon = document.querySelector('#pw1-toggle i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fa-solid fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fa-solid fa-eye';
+    }
+  }
+
+  // ── Password strength ──
+  document.getElementById('pw1').addEventListener('input', function() {
+    const val = this.value;
+    const bar = document.getElementById('strength-bar');
+    const txt = document.getElementById('strength-text');
+    let strength = 0;
+    if (val.length >= 8) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[^A-Za-z0-9]/.test(val)) strength++;
+    const colors = ['#ef4444','#f59e0b','#10b981','#6366f1'];
+    const labels = ['Weak','Fair','Good','Strong'];
+    bar.style.width = (strength * 25) + '%';
+    bar.style.background = colors[strength-1] || 'var(--border)';
+    txt.textContent = val.length > 0 ? labels[strength-1] || '' : '';
+    txt.style.color = colors[strength-1] || 'var(--text3)';
+  });
+
+  // ── Show message helper ──
+  function showMessage(text, type) {
+    const box = document.getElementById('form-message');
+    box.textContent = text;
+    box.style.display = 'block';
+    if (type === 'error') {
+      box.style.background = 'rgba(239,68,68,0.12)';
+      box.style.color = '#f87171';
+      box.style.border = '1px solid rgba(239,68,68,0.25)';
+    } else {
+      box.style.background = 'rgba(16,185,129,0.12)';
+      box.style.color = '#34d399';
+      box.style.border = '1px solid rgba(16,185,129,0.25)';
+    }
+  }
+
+  // ── Signup submit ──
+  async function doSignup(btn) {
+    const name  = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const pw1   = document.getElementById('pw1').value;
+    const pw2   = document.getElementById('pw2').value;
+    const terms = document.getElementById('terms').checked;
+
+    // Basic validation
+    const inputs = [
+      document.getElementById('signup-name'),
+      document.getElementById('signup-email'),
+      document.getElementById('pw1'),
+      document.getElementById('pw2')
+    ];
+    let valid = true;
+    inputs.forEach(input => {
+      if (!input.value.trim()) {
+        input.style.borderColor = '#ef4444';
+        valid = false;
+        setTimeout(() => { input.style.borderColor=''; }, 2000);
+      }
+    });
+
+    if (!terms) {
+      showMessage('Please accept the Terms of Service.', 'error');
+      return;
+    }
+    if (pw1 !== pw2) {
+      document.getElementById('pw2').style.borderColor = '#ef4444';
+      showMessage('Passwords do not match.', 'error');
+      return;
+    }
+    if (pw1.length < 8) {
+      showMessage('Password must be at least 8 characters.', 'error');
+      return;
+    }
+    if (!valid) return;
+
+    // Disable button during request
+    btn.disabled = true;
+    btn.innerHTML = 'Creating Account...';
+
+    try {
+      const res = await fetch(`${API_BASE}/users/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password: pw1 })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showMessage(data.detail || 'Signup failed. Try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Create Account';
+        return;
+      }
+
+      btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Account Created!';
+      btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+      showMessage('Account created! Check your email (' + email + ') for a verification link before logging in.', 'success');
+
+      // Hide the form, show a clear next-step message
+      document.getElementById('signup-form').style.display = 'none';
+
+      setTimeout(() => { window.location.href = 'login.html'; }, 3500);
+
+    } catch (err) {
+      showMessage('Could not connect to server. Is the backend running?', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Create Account';
+    }
+  }
+</script>
+</body>
+</html>

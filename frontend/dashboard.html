@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <button class="hamburger-btn" onclick="toggleMobileNav(this)">☰</button>
+    <div class="nav-menu" id="mobile-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="ideas.html"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+      <a href="forum.html"><i class="fa-solid fa-users"></i> Community</a>
+      <a href="dashboard.html" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <a href="login.html" class="login-btn">Login</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+      <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
+      <a href="messages.html" class="messages-nav-icon" title="Messages"><i class="fa-solid fa-comments"></i></a>
+    </div>
+  </div>
+</nav>
+
+<div class="container section">
+
+  <!-- ── PROFILE HEADER ── -->
+  <div class="glass-card mb-4" style="animation:fadeUp 0.6s ease both;">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div id="user-avatar" style="width:72px;height:72px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 4px rgba(108,99,255,0.2),var(--glow-indigo);">AK</div>
+      <div style="flex:1;min-width:160px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+          <h2 id="user-name" style="font-size:22px;margin:0;">Arjun Kumar</h2>
+          <span id="user-badge" style="background:var(--accent-grad);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;"><i class="fa-solid fa-star"></i> Pro Member</span>
+        </div>
+        <p class="muted" id="user-meta" style="font-size:13px;margin:0;">Full Stack Dev · Chennai, India · Member since Jan 2026</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="submit-idea.html" class="btn btn-primary btn-sm">+ New Idea</a>
+        <a href="profile.html" class="btn btn-sm" style="background:var(--card);border:1px solid var(--border);color:var(--text);">View Profile</a>
+        <button class="btn btn-sm btn-danger" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAT CARDS ── -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="glass-card text-center" data-reveal>
+        <div style="font-size:26px;margin-bottom:8px;"><i class="fa-solid fa-lightbulb" style="color:var(--accent2);"></i></div>
+        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">24</h2>
+        <p class="muted" style="font-size:13px;">Ideas Posted</p>
+        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +3 this month</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="glass-card text-center" data-reveal>
+        <div style="font-size:26px;margin-bottom:8px;"><i class="fa-solid fa-thumbs-up" style="color:#3b82f6;"></i></div>
+        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">1.2K</h2>
+        <p class="muted" style="font-size:13px;">Total Likes</p>
+        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +84 this week</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="glass-card text-center" data-reveal>
+        <div style="font-size:26px;margin-bottom:8px;"><i class="fa-solid fa-eye" style="color:var(--accent2);"></i></div>
+        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">18K</h2>
+        <p class="muted" style="font-size:13px;">Profile Views</p>
+        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +1.2K this month</span>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="glass-card text-center" data-reveal>
+        <div style="font-size:26px;margin-bottom:8px;"><i class="fa-regular fa-comment" style="color:var(--accent2);"></i></div>
+        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">145</h2>
+        <p class="muted" style="font-size:13px;">Comments</p>
+        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +12 today</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MY IDEAS + NOTIFICATIONS (2 col) ── -->
+  <div class="row g-4 mb-4">
+
+    <!-- MY IDEAS -->
+    <div class="col-md-8">
+      <div class="glass-card" data-reveal style="height:100%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+          <h4 style="margin:0;"><i class="fa-solid fa-lightbulb"></i> My Ideas</h4>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm" onclick="filterMyIdeas('all',this)" style="background:var(--accent-grad);color:#fff;border:none;">All</button>
+            <button class="btn btn-sm" onclick="filterMyIdeas('published',this)" style="background:var(--card);border:1px solid var(--border);color:var(--text2);">Published</button>
+            <button class="btn btn-sm" onclick="filterMyIdeas('draft',this)" style="background:var(--card);border:1px solid var(--border);color:var(--text2);">Drafts</button>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;" id="my-ideas-list">
+          <p class="muted" style="text-align:center;padding:20px;" id="my-ideas-loading">Loading your ideas...</p>
+        </div>
+
+        <a href="submit-idea.html" class="btn btn-primary w-100" style="margin-top:16px;">+ Submit New Idea</a>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="col-md-4">
+      <div class="glass-card" data-reveal style="height:100%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <h4 style="margin:0;"><i class="fa-solid fa-bell"></i> Notifications</h4>
+          <span id="notif-count-badge" style="background:var(--accent-grad);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;">0 New</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="notif-list">
+          <p class="muted" style="text-align:center;padding:20px;font-size:13px;" id="notif-loading">Loading notifications...</p>
+        </div>
+        <button class="btn w-100" style="margin-top:14px;background:var(--card);border:1px solid var(--border);color:var(--text2);font-size:13px;" onclick="clearAllNotif()">Clear All Notifications</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ANALYTICS + BOOKMARKS ── -->
+  <div class="row g-4 mb-4">
+
+    <!-- IDEA PERFORMANCE -->
+    <div class="col-md-6">
+      <div class="glass-card" data-reveal>
+        <h4 style="margin-bottom:18px;"><i class="fa-solid fa-chart-simple"></i> Idea Performance</h4>
+        <div style="display:flex;flex-direction:column;gap:14px;" id="idea-performance-list">
+          <p class="muted" style="text-align:center;padding:10px 0;font-size:13px;" id="performance-loading">Loading your idea stats...</p>
+        </div>
+
+        <!-- Weekly summary -->
+        <div style="margin-top:20px;padding:14px;background:rgba(108,99,255,0.06);border:1px solid var(--border);border-radius:12px;">
+          <div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">This Week</div>
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div style="text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:var(--text);">+240</div>
+              <div style="font-size:11px;color:var(--text3);">Views</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:var(--text);">+84</div>
+              <div style="font-size:11px;color:var(--text3);">Likes</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:var(--text);">+12</div>
+              <div style="font-size:11px;color:var(--text3);">Comments</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:#10b981;">+3</div>
+              <div style="font-size:11px;color:var(--text3);">Followers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKMARKS -->
+    <div class="col-md-6">
+      <div class="glass-card" data-reveal>
+        <h4 style="margin-bottom:18px;"><i class="fa-solid fa-bookmark"></i> Saved Ideas</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="bookmarks-list">
+          <p class="muted" style="text-align:center;padding:20px;font-size:13px;" id="bookmarks-loading">Loading saved ideas...</p>
+        </div>
+        <a href="ideas.html" class="btn w-100" style="margin-top:14px;background:var(--card);border:1px solid var(--border);color:var(--text2);font-size:13px;">Browse More Ideas →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRICING MODAL ── -->
+  <div id="pricing-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:16px;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:32px 24px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+      <button onclick="closePricingModal()" style="position:absolute;top:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;color:var(--text2);font-size:16px;cursor:pointer;">✕</button>
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="font-size:36px;margin-bottom:10px;"><i class="fa-solid fa-star" style="color:#f59e0b;"></i></div>
+        <h3 style="font-size:22px;margin-bottom:6px;">Choose Your Plan</h3>
+        <p class="muted">Unlock more features and grow your startup ideas.</p>
+      </div>
+      <div class="row g-3">
+
+        <!-- FREE -->
+        <div class="col-md-4">
+          <div style="border:1px solid var(--border);border-radius:14px;padding:20px;height:100%;background:var(--card);">
+            <h5 style="margin-bottom:4px;">Free</h5>
+            <div style="font-size:28px;font-weight:800;margin-bottom:4px;">₹0</div>
+            <p class="muted" style="font-size:12px;margin-bottom:16px;">Forever free</p>
+            <ul style="list-style:none;padding:0;margin:0;font-size:13px;color:var(--text2);display:flex;flex-direction:column;gap:8px;">
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Unlimited idea publishing</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Comments, likes & sharing</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Community forum access</li>
+              <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> No verified badge</li>
+              <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> No analytics</li>
+              <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> No investor visibility</li>
+            </ul>
+            <div style="margin-top:20px;">
+              <span style="display:block;text-align:center;padding:10px;border-radius:8px;background:var(--bg);color:var(--text3);font-size:13px;">Current Plan</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRO -->
+        <div class="col-md-4">
+          <div style="border:2px solid var(--accent);border-radius:14px;padding:20px;height:100%;background:rgba(108,99,255,0.06);position:relative;">
+            <span style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent-grad);color:#fff;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;white-space:nowrap;">Most Popular</span>
+            <h5 style="margin-bottom:4px;display:flex;align-items:center;gap:6px;">Pro <i class="fa-solid fa-circle-check" style="color:#3b82f6;font-size:14px;" title="Verified Founder Badge"></i></h5>
+            <div style="font-size:28px;font-weight:800;margin-bottom:4px;">₹299<span style="font-size:14px;font-weight:400;color:var(--text3);">/mo</span></div>
+            <p class="muted" style="font-size:12px;margin-bottom:16px;">Billed monthly</p>
+            <ul style="list-style:none;padding:0;margin:0;font-size:13px;color:var(--text2);display:flex;flex-direction:column;gap:8px;">
+              <li><i class="fa-solid fa-circle-check" style="color:#3b82f6;"></i> Blue Verified Founder badge</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Priority placement in Trending</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Analytics dashboard</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> See who viewed your idea</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Listed in the investor feed</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Unlimited AI idea analysis</li>
+            </ul>
+            <div style="margin-top:20px;">
+              <button onclick="handleUpgrade('pro', this)" id="upgrade-pro-btn" class="btn btn-primary w-100" style="font-size:13px;">Upgrade to Pro <i class="fa-solid fa-sparkles"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PREMIUM -->
+        <div class="col-md-4">
+          <div style="border:1px solid rgba(255,215,0,0.4);border-radius:14px;padding:20px;height:100%;background:rgba(255,215,0,0.04);">
+            <h5 style="margin-bottom:4px;display:flex;align-items:center;gap:6px;">Premium <i class="fa-solid fa-certificate" style="color:#fbbf24;font-size:14px;" title="Gold Verified Badge"></i></h5>
+            <div style="font-size:28px;font-weight:800;margin-bottom:4px;">₹2,499<span style="font-size:14px;font-weight:400;color:var(--text3);">/yr</span></div>
+            <p class="muted" style="font-size:12px;margin-bottom:16px;">Save 30% vs monthly</p>
+            <ul style="list-style:none;padding:0;margin:0;font-size:13px;color:var(--text2);display:flex;flex-direction:column;gap:8px;">
+              <li><i class="fa-solid fa-certificate" style="color:#fbbf24;"></i> Gold badge (everything in Pro)</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Featured on the homepage feed</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Downloadable pitch-deck export</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Early access to new features</li>
+              <li><i class="fa-solid fa-check" style="color:#34d399;"></i> Priority email support</li>
+            </ul>
+            <div style="margin-top:20px;">
+              <button onclick="handleUpgrade('premium', this)" id="upgrade-premium-btn" class="btn w-100" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:13px;">Go Premium <i class="fa-solid fa-star"></i></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <p class="muted" style="text-align:center;margin-top:20px;font-size:12px;">Questions? <a href="contact.html" style="color:var(--accent2);">Contact us</a> — we'll help you choose the right plan.</p>
+    </div>
+  </div>
+
+  <!-- ── UPGRADE TO PRO BANNER ── -->
+  <div class="glass-card" data-reveal style="background:rgba(108,99,255,0.08);border-color:var(--border2);text-align:center;padding:40px 24px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:280px;height:200px;background:radial-gradient(ellipse,rgba(108,99,255,0.2) 0%,transparent 70%);pointer-events:none;"></div>
+    <div style="position:relative;z-index:1;">
+      <div style="font-size:36px;margin-bottom:12px;"><i class="fa-solid fa-star" style="color:#f59e0b;"></i></div>
+      <h3 style="font-size:20px;margin-bottom:8px;">You're on the Pro Plan!</h3>
+      <p class="muted" style="margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto;">Enjoy unlimited ideas, investor visibility, analytics, and featured listings. Upgrade to Premium Yearly to save 30%.</p>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+        <button onclick="openPricingModal()" class="btn btn-primary">Upgrade to Premium <i class="fa-solid fa-sparkles"></i></button>
+        <a href="profile.html" class="btn btn-light">Manage Subscription</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer><p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+
+  const API_BASE = "http://localhost:8000";
+  const token = localStorage.getItem('ss_token');
+
+  let myIdeasData = [];
+  let currentFilter = 'all';
+  let dashboardNotifications = [];
+
+  const catIcons = {
+    AI: 'fa-robot', Education: 'fa-graduation-cap', Finance: 'fa-sack-dollar', Healthcare: 'fa-heart-pulse',
+    Green: 'fa-leaf', Marketplace: 'fa-store', 'E-Commerce': 'fa-bag-shopping', Other: 'fa-lightbulb'
+  };
+
+  /* ── Load Dashboard data from backend (ideas + bookmarks + notifications) ── */
+  async function loadMyIdeas() {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/dashboard/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+
+      myIdeasData = data.recent_ideas || [];
+      renderMyIdeas();
+      renderIdeaPerformance();
+
+      renderBookmarks(data.bookmarked_ideas || []);
+
+      dashboardNotifications = data.notifications || [];
+      renderNotifications(dashboardNotifications);
+
+    } catch (err) {
+      document.getElementById('my-ideas-loading').textContent = 'Could not load ideas.';
+      document.getElementById('bookmarks-loading').textContent = 'Could not load saved ideas.';
+      document.getElementById('notif-loading').textContent = 'Could not load notifications.';
+      const perfEl = document.getElementById('performance-loading');
+      if (perfEl) perfEl.textContent = 'Could not load idea stats.';
+    }
+  }
+
+  /* ── Render Idea Performance — YOUR ideas only, sorted by views, highest first ── */
+  function renderIdeaPerformance() {
+    const container = document.getElementById('idea-performance-list');
+
+    // Only your published ideas have real view counts worth comparing
+    const published = myIdeasData.filter(i => i.status === 'published');
+
+    if (published.length === 0) {
+      container.innerHTML = `<p class="muted" style="text-align:center;padding:10px 0;font-size:13px;">
+        No published ideas yet. <a href="submit-idea.html" style="color:var(--accent2);">Post your first idea →</a>
+      </p>`;
+      return;
+    }
+
+    // Sort by views, highest first — show top 4
+    const topIdeas = [...published].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 4);
+    const maxViews = Math.max(...topIdeas.map(i => i.views || 0), 1);
+
+    container.innerHTML = topIdeas.map(idea => {
+      const icon = catIcons[idea.category] || 'fa-lightbulb';
+      const pct = Math.max(6, Math.round((idea.views || 0) / maxViews * 100));
+      return `
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:13px;color:var(--text);"><i class="fa-solid ${icon}"></i> ${escapeHtmlDash(idea.title)}</span>
+            <span style="font-size:13px;color:var(--accent2);font-weight:600;">${idea.views || 0} views</span>
+          </div>
+          <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:var(--accent-grad);border-radius:3px;transition:width 1s ease;" class="perf-bar"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Animate the newly-inserted bars
+    const bars = container.querySelectorAll('.perf-bar');
+    bars.forEach(b => {
+      const targetWidth = b.style.width;
+      b.style.width = '0%';
+      requestAnimationFrame(() => {
+        setTimeout(() => { b.style.width = targetWidth; }, 50);
+      });
+    });
+  }
+
+  /* ── Render My Ideas list ── */
+  function renderMyIdeas() {
+    const list = document.getElementById('my-ideas-list');
+
+    const filtered = myIdeasData.filter(idea =>
+      currentFilter === 'all' || idea.status === currentFilter
+    );
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<p class="muted" style="text-align:center;padding:20px;">
+        ${myIdeasData.length === 0
+          ? 'No ideas yet. <a href="submit-idea.html" style="color:var(--accent2);">Submit your first idea →</a>'
+          : 'No ' + currentFilter + ' ideas.'}
+      </p>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(idea => {
+      const icon = catIcons[idea.category] || 'fa-lightbulb';
+      const isPublished = idea.status === 'published';
+
+      const statusBadge = isPublished
+        ? `<span style="background:rgba(16,185,129,0.14);color:#34d399;border:1px solid rgba(16,185,129,0.25);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;">Published</span>`
+        : `<span style="background:rgba(245,158,11,0.14);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;">Draft</span>`;
+
+      const statsLine = isPublished
+        ? `<i class="fa-solid fa-thumbs-up"></i> ${idea.like_count} &nbsp;·&nbsp; <i class="fa-solid fa-eye"></i> ${idea.views}`
+        : `Draft — Not published yet`;
+
+      const publishBtn = !isPublished
+        ? `<button class="btn btn-sm btn-success" style="padding:5px 10px;font-size:11px;" onclick="publishIdea(${idea.id}, this)">Publish</button>`
+        : '';
+
+      return `
+        <div class="my-idea-row" data-status="${idea.status}" data-id="${idea.id}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:all 0.25s;flex-wrap:wrap;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(108,99,255,0.25),rgba(155,89,245,0.15));border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="fa-solid ${icon}"></i></div>
+          <div style="flex:1;min-width:120px;">
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;">${escapeHtmlDash(idea.title)}</div>
+            <div style="font-size:12px;color:var(--text3);">${statsLine}</div>
+          </div>
+          ${statusBadge}
+          <div style="display:flex;gap:6px;">
+            ${publishBtn}
+            <a href="submit-idea.html?edit=${idea.id}" class="btn btn-sm" style="background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 10px;text-decoration:none;"><i class="fa-solid fa-pen"></i></a>
+            <button class="btn btn-sm btn-danger" style="padding:5px 10px;" onclick="deleteIdea(${idea.id}, this)"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function escapeHtmlDash(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  /* ── Filter My Ideas ── */
+  function filterMyIdeas(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('#my-ideas-list').forEach(() => {});
+    document.querySelectorAll('h4 + div .btn').forEach(b => {
+      b.style.background = 'var(--card)';
+      b.style.border = '1px solid var(--border)';
+      b.style.color = 'var(--text2)';
+    });
+    btn.style.background = 'var(--accent-grad)';
+    btn.style.border = 'none';
+    btn.style.color = '#fff';
+    renderMyIdeas();
+  }
+
+  /* ── Delete Idea (calls backend) ── */
+  async function deleteIdea(ideaId, btn) {
+    if (!confirm('Delete this idea? This cannot be undone.')) return;
+
+    const row = btn.closest('.my-idea-row');
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(30px)';
+        row.style.transition = 'all 0.35s ease';
+        setTimeout(() => {
+          myIdeasData = myIdeasData.filter(i => i.id !== ideaId);
+          renderMyIdeas();
+          renderIdeaPerformance();
+        }, 350);
+      } else {
+        alert('Failed to delete idea.');
+      }
+    } catch (err) {
+      alert('Could not connect to server.');
+    }
+  }
+
+  /* ── Publish Draft (calls backend) ── */
+  async function publishIdea(ideaId, btn) {
+    btn.textContent = 'Publishing...';
+    btn.disabled = true;
+    try {
+      const getRes = await fetch(`${API_BASE}/ideas/${ideaId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const idea = await getRes.json();
+      if (!getRes.ok) throw new Error('fetch failed');
+
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: idea.title,
+          category: idea.category,
+          problem: idea.problem,
+          solution: idea.solution,
+          target: idea.target,
+          revenue_model: idea.revenue_model,
+          tech_stack: idea.tech_stack,
+          tags: idea.tags,
+          status: 'published'
+        })
+      });
+
+      if (res.ok) {
+        const item = myIdeasData.find(i => i.id === ideaId);
+        if (item) item.status = 'published';
+        renderMyIdeas();
+        renderIdeaPerformance();
+      } else {
+        alert('Failed to publish idea.');
+        btn.textContent = 'Publish';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      alert('Could not connect to server.');
+      btn.textContent = 'Publish';
+      btn.disabled = false;
+    }
+  }
+
+  /* ── Render Notifications (read-only feed, client-side "read" state) ── */
+  const readNotifIndices = new Set();
+
+  function renderNotifications(notifications) {
+    const list = document.getElementById('notif-list');
+
+    if (!notifications || notifications.length === 0) {
+      list.innerHTML = '<p class="muted" style="text-align:center;padding:20px;font-size:13px;">No notifications yet.</p>';
+      document.getElementById('notif-count-badge').textContent = '0 New';
+      return;
+    }
+
+    list.innerHTML = notifications.map((n, i) => {
+      const timeAgo = formatTimeAgoDash(n.created_at);
+      const isRead = readNotifIndices.has(i);
+      const bg = isRead ? 'var(--card)' : 'rgba(108,99,255,0.08)';
+      const border = isRead ? 'var(--border)' : 'rgba(108,99,255,0.2)';
+      const cursor = isRead ? 'default' : 'pointer';
+      const opacity = isRead ? '0.6' : '1';
+
+      return `
+        <div class="notif-item" data-idx="${i}" style="display:flex;gap:10px;padding:10px 12px;background:${bg};border:1px solid ${border};border-radius:10px;cursor:${cursor};opacity:${opacity};transition:all 0.25s;" onclick="markRead(${i})">
+          <div style="font-size:18px;flex-shrink:0;">${n.icon}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">${escapeHtmlDash(n.title)}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;">${escapeHtmlDash(n.subtitle)} · ${timeAgo}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    updateNotifBadge(notifications.length);
+  }
+
+  function updateNotifBadge(total) {
+    const unread = total - readNotifIndices.size;
+    const badge = document.getElementById('notif-count-badge');
+    if (unread > 0) {
+      badge.textContent = unread + ' New';
+      badge.style.background = 'var(--accent-grad)';
+    } else {
+      badge.textContent = 'All Read';
+      badge.style.background = 'rgba(255,255,255,0.08)';
+    }
+  }
+
+  function markRead(idx) {
+    readNotifIndices.add(idx);
+    const el = document.querySelector(`.notif-item[data-idx="${idx}"]`);
+    if (el) {
+      el.style.background = 'var(--card)';
+      el.style.borderColor = 'var(--border)';
+      el.style.opacity = '0.6';
+      el.style.cursor = 'default';
+      el.onclick = null;
+    }
+    updateNotifBadge(dashboardNotifications.length);
+  }
+
+  function clearAllNotif() {
+    dashboardNotifications.forEach((_, i) => readNotifIndices.add(i));
+    document.querySelectorAll('.notif-item').forEach(n => {
+      n.style.background = 'var(--card)';
+      n.style.borderColor = 'var(--border)';
+      n.style.opacity = '0.5';
+      n.onclick = null;
+    });
+    updateNotifBadge(dashboardNotifications.length);
+  }
+
+  function formatTimeAgoDash(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+  }
+
+  /* ── Render Bookmarks (real saved ideas, with un-bookmark action) ── */
+  function renderBookmarks(bookmarkedIdeas) {
+    const list = document.getElementById('bookmarks-list');
+
+    if (!bookmarkedIdeas || bookmarkedIdeas.length === 0) {
+      list.innerHTML = '<p class="muted" style="text-align:center;padding:20px;font-size:13px;">No saved ideas yet. <a href="ideas.html" style="color:var(--accent2);">Browse ideas →</a></p>';
+      return;
+    }
+
+    list.innerHTML = bookmarkedIdeas.map(idea => {
+      const icon = catIcons[idea.category] || 'fa-lightbulb';
+      return `
+        <div class="bookmark-row" data-id="${idea.id}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;transition:all 0.25s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:22px;"><i class="fa-solid ${icon}"></i></div>
+          <a href="idea-details.html?id=${idea.id}" style="flex:1;text-decoration:none;color:inherit;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);">${escapeHtmlDash(idea.title)}</div>
+            <div style="font-size:11px;color:var(--text3);">${escapeHtmlDash(idea.category)} · <i class="fa-solid fa-thumbs-up"></i> ${idea.like_count}</div>
+          </a>
+          <button class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--text3);padding:4px 8px;font-size:12px;" onclick="removeBookmark(${idea.id}, this)" title="Remove"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ── Remove Bookmark (calls backend) ── */
+  async function removeBookmark(ideaId, btn) {
+    const row = btn.closest('.bookmark-row');
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}/bookmark`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(20px)';
+        row.style.transition = 'all 0.3s ease';
+        setTimeout(() => row.remove(), 300);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  /* ── LOAD REAL USER DATA ── */
+  const userStr = localStorage.getItem('ss_user');
+
+  if (!token || !userStr) {
+    window.location.href = 'login.html';
+  } else {
+    const user = JSON.parse(userStr);
+    const API_BASE_DASH = "http://localhost:8000";
+
+    document.getElementById('user-name').textContent = user.name;
+
+    // Avatar — show image if available, else initials
+    const avatarEl = document.getElementById('user-avatar');
+    if (user.avatar_url) {
+      avatarEl.style.backgroundImage = `url('${API_BASE_DASH}${user.avatar_url}')`;
+      avatarEl.style.backgroundSize = 'cover';
+      avatarEl.style.backgroundPosition = 'center';
+      avatarEl.textContent = '';
+    } else {
+      const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      avatarEl.textContent = initials;
+    }
+
+    // Pro badge
+    const badge = document.getElementById('user-badge');
+    if (user.is_pro) {
+      badge.innerHTML = '<i class="fa-solid fa-star"></i> Pro Member';
+      badge.style.display = 'inline-block';
+    } else {
+      badge.textContent = 'Free Plan';
+      badge.style.background = 'var(--card)';
+      badge.style.border = '1px solid var(--border)';
+      badge.style.color = 'var(--text2)';
+    }
+
+    // Meta line
+    const joinDate = new Date(user.created_at);
+    const joinStr = joinDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+    const location = user.location ? user.location : 'Location not set';
+    const bio = user.bio ? user.bio : 'No bio yet';
+    document.getElementById('user-meta').textContent = `${bio} · ${location} · Member since ${joinStr}`;
+  }
+
+
+  /* ── LOGOUT ── */
+  function doLogout() {
+    localStorage.removeItem('ss_token');
+    localStorage.removeItem('ss_user');
+    window.location.href = 'login.html';
+  }
+
+
+  loadMyIdeas();
+
+  /* ── Pricing Modal ── */
+  function openPricingModal() {
+    const modal = document.getElementById('pricing-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePricingModal() {
+    const modal = document.getElementById('pricing-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  const PLAN_LABELS_DASH = { pro: "Pro Monthly", premium: "Premium Yearly" };
+
+  async function handleUpgrade(plan, btn) {
+    if (!token) { window.location.href = 'login.html'; return; }
+
+    const originalHTML = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = 'Preparing checkout...'; }
+
+    try {
+      // Step 1 — create a Razorpay order on the backend
+      const orderRes = await fetch(`${API_BASE}/payments/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ plan })
+      });
+      const orderData = await orderRes.json();
+
+      if (!orderRes.ok) {
+        alert(orderData.detail || 'Could not start checkout. Please try again.');
+        if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+        return;
+      }
+
+      closePricingModal();
+
+      // Step 2 — open Razorpay Checkout (Google Pay / UPI / cards)
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "StartupSphere",
+        description: `${PLAN_LABELS_DASH[plan]} Subscription`,
+        order_id: orderData.order_id,
+        theme: { color: "#6c63ff" },
+        method: { upi: true, card: true, netbanking: true, wallet: false },
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch(`${API_BASE}/payments/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            const verifyData = await verifyRes.json();
+
+            if (verifyRes.ok && verifyData.success) {
+              const userStr = localStorage.getItem('ss_user');
+              if (userStr) {
+                const user = JSON.parse(userStr);
+                user.is_pro = true;
+                user.plan_type = verifyData.plan_type;
+                localStorage.setItem('ss_user', JSON.stringify(user));
+              }
+              alert(verifyData.message);
+              window.location.reload();
+            } else {
+              alert(verifyData.detail || 'Payment verification failed. If money was deducted, contact support.');
+            }
+          } catch (err) {
+            alert('Could not verify payment. If money was deducted, contact support.');
+          }
+          if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+        },
+        modal: {
+          ondismiss: function () {
+            if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      alert('Could not connect to server. Is the backend running?');
+      if (btn) { btn.disabled = false; btn.innerHTML = originalHTML; }
+    }
+  }
+
+  // Close modal on outside click
+  document.getElementById('pricing-modal').addEventListener('click', function(e) {
+    if (e.target === this) closePricingModal();
+  });
+
+</script>
+</body>
+</html>

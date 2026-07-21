@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community | StartupSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-theme="dark">
+    <nav class="navbar premium-nav">
+      <div class="container">
+        <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+        <button class="hamburger-btn" onclick="toggleMobileNav(this)">☰</button>
+        <div class="nav-menu" id="mobile-nav">
+          <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+          <a href="ideas.html"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+          <a href="forum.html" class="active"><i class="fa-solid fa-users"></i> Community</a>
+          <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        </div>
+        <div class="nav-actions">
+          <a href="login.html" class="login-btn">Login</a>
+          <a href="signup.html" class="btn btn-primary">Get Started</a>
+          <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
+          <a href="messages.html" class="messages-nav-icon" title="Messages"><i class="fa-solid fa-comments"></i></a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container section">
+      <!-- HEADER -->
+      <div class="glass-card mb-4" style="animation: fadeUp 0.6s ease both">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h2 style="margin-bottom:6px"><i class="fa-solid fa-globe"></i> Community Forum</h2>
+            <p class="muted">Connect, discuss, and collaborate with startup founders worldwide.</p>
+          </div>
+          <button class="btn btn-primary" onclick="toggleNewPostForm()">+ New Post</button>
+        </div>
+
+        <!-- MESSAGE BOX -->
+        <div id="form-message" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-top:14px;text-align:center;"></div>
+
+        <!-- NEW POST FORM -->
+        <div id="new-post-form" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+          <div class="mb-3">
+            <input id="new-post-title" class="form-control" placeholder="Post title..." style="margin-bottom:10px" />
+            <textarea id="new-post-body" class="form-control" rows="3" placeholder="Share your thoughts, questions, or ideas..."></textarea>
+          </div>
+
+          <!-- IMAGE PICKER -->
+          <div class="mb-3">
+            <input type="file" id="new-post-image" accept="image/*" style="display:none;" onchange="handleImagePreview(this)">
+            <div id="image-picker-btn" onclick="document.getElementById('new-post-image').click()" style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px dashed var(--border2);border-radius:10px;cursor:pointer;font-size:13px;color:var(--text2);">
+              <i class="fa-solid fa-image"></i> Add Image (optional)
+            </div>
+            <div id="image-preview-wrap" style="display:none;margin-top:10px;position:relative;width:fit-content;">
+              <img id="image-preview" src="" style="max-width:220px;max-height:160px;border-radius:10px;border:1px solid var(--border);display:block;">
+              <button type="button" onclick="clearImagePreview()" style="position:absolute;top:-8px;right:-8px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select id="new-post-category" class="form-control" style="width:auto;">
+              <option>General</option>
+              <option>Ideas</option>
+              <option>Co-founder Search</option>
+              <option>Funding</option>
+            </select>
+            <button class="btn btn-primary btn-sm" id="post-thread-btn" onclick="postThread()">Post</button>
+            <button class="btn btn-sm" style="background:var(--card);border:1px solid var(--border);color:var(--text);" onclick="toggleNewPostForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">        <!-- THREADS LIST — full width -->
+        <div style="width:100%;">
+          <!-- TABS -->
+          <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;">
+            <button class="forum-tab active" onclick="setTab(this,'all')" style="flex:1;padding:8px;border:none;background:var(--accent-grad);color:#fff;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600;">All Posts</button>
+            <button class="forum-tab" onclick="setTab(this,'trending')" style="flex:1;padding:8px;border:none;background:transparent;color:var(--text2);border-radius:9px;font-size:13px;cursor:pointer;">Trending</button>
+            <button class="forum-tab" onclick="setTab(this,'new')" style="flex:1;padding:8px;border:none;background:transparent;color:var(--text2);border-radius:9px;font-size:13px;cursor:pointer;">Newest</button>
+          </div>
+
+          <!-- LOADING -->
+          <div id="loading-state" style="text-align:center;padding:40px 0;color:var(--text3);">
+            <div style="font-size:32px;margin-bottom:12px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            Loading discussions...
+          </div>
+
+          <!-- THREADS -->
+          <div style="display:flex;flex-direction:column;gap:12px;" id="threads-list"></div>
+
+          <!-- No threads -->
+          <div id="no-threads" style="display:none;text-align:center;padding:48px 0;color:var(--text3);">
+            <div style="font-size:48px;margin-bottom:12px;"><i class="fa-solid fa-comment-dots"></i></div>
+            <p>No discussions yet. Be the first to post!</p>
+          </div>
+
+        </div><!-- end threads col -->
+
+        <!-- BOTTOM SECTION — Top Contributors + Trending Tags side by side -->
+<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+
+          <!-- Top Contributors -->
+          <div class="glass-card" data-reveal style="flex:1;min-width:260px;">
+            <h6 style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;"><i class="fa-solid fa-trophy"></i> Top Contributors</h6>
+            <div style="display:flex;flex-direction:column;gap:12px;" id="top-contributors">
+              <p class="muted" style="font-size:13px;">Loading...</p>
+            </div>
+          </div>
+
+          <!-- Trending Tags -->
+          <div class="glass-card" data-reveal style="flex:1;min-width:260px;">
+            <h6 style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;"><i class="fa-solid fa-fire"></i> Categories</h6>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <span class="btn btn-sm btn-primary category-tag" data-cat="">All</span>
+              <span class="btn btn-sm btn-primary category-tag" data-cat="General">#General</span>
+              <span class="btn btn-sm btn-primary category-tag" data-cat="Ideas">#Ideas</span>
+              <span class="btn btn-sm btn-primary category-tag" data-cat="Co-founder Search">#Cofounder</span>
+              <span class="btn btn-sm btn-primary category-tag" data-cat="Funding">#Funding</span>
+            </div>
+          </div>
+
+        </div><!-- end bottom section -->
+
+      </div><!-- end outer column flex -->
+    </div>
+
+    
+<footer><p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p></footer>  </div>
+</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+      const API_BASE = "http://localhost:8000";
+      const token = localStorage.getItem('ss_token');
+      const userStr = localStorage.getItem('ss_user');
+      const currentUser = userStr ? JSON.parse(userStr) : null;
+
+      let allThreads = [];
+      let currentSort = 'all'; // all | trending | new
+      let activeCategory = '';
+
+      const catColors = {
+        'General': 'rgba(108,99,255,0.14)',
+        'Ideas': 'rgba(16,185,129,0.14)',
+        'Co-founder Search': 'rgba(245,158,11,0.14)',
+        'Funding': 'rgba(255,107,222,0.14)'
+      };
+
+      /* ── Load all threads ── */
+      async function loadThreads() {
+        try {
+          const res = await fetch(`${API_BASE}/forum/`);
+          const data = await res.json();
+
+          if (!res.ok) {
+            document.getElementById('loading-state').innerHTML = '<p style="color:#f87171;">Failed to load discussions.</p>';
+            return;
+          }
+
+          allThreads = data;
+          document.getElementById('loading-state').style.display = 'none';
+          renderThreads();
+          renderTopContributors();
+
+        } catch (err) {
+          document.getElementById('loading-state').innerHTML = '<p style="color:#f87171;">Could not connect to server. Is the backend running?</p>';
+        }
+      }
+
+      /* ── Render thread list ── */
+      function renderThreads() {
+        let threads = [...allThreads];
+
+        // Category filter
+        if (activeCategory) {
+          threads = threads.filter(t => t.category === activeCategory);
+        }
+
+        // Sort
+        if (currentSort === 'trending') {
+          threads.sort((a, b) => b.reply_count - a.reply_count);
+        } else if (currentSort === 'new') {
+          threads.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        }
+
+        const list = document.getElementById('threads-list');
+        const noThreads = document.getElementById('no-threads');
+
+        if (threads.length === 0) {
+          list.innerHTML = '';
+          noThreads.style.display = 'block';
+          return;
+        }
+        noThreads.style.display = 'none';
+
+        list.innerHTML = threads.map(t => {
+          const initials = t.author.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+          const timeAgo = formatTimeAgo(t.created_at);
+          const replyId = `replies-${t.id}`;
+          const postImage = t.image_url
+            ? `<img src="${API_BASE}${t.image_url}" alt="" style="width:100%;max-height:280px;object-fit:cover;border-radius:10px;margin-top:10px;display:block;">`
+            : '';
+
+          const isOwner = currentUser && t.author && currentUser.id === t.author.id;
+          const deleteBtn = isOwner
+            ? `<button class="btn btn-sm" title="Delete post" onclick="event.stopPropagation(); deleteThread(${t.id}, this)" style="background:transparent;border:1px solid var(--border);color:#f87171;padding:4px 9px;font-size:12px;flex-shrink:0;"><i class="fa-solid fa-trash"></i></button>`
+            : '';
+
+          return `
+            <div class="glass-card" style="opacity:1;" id="thread-card-${t.id}">
+              <div style="display:flex;gap:12px;align-items:flex-start;">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;cursor:pointer;" onclick="toggleReplies(${t.id})">${initials}</div>
+                <div style="flex:1;min-width:0;cursor:pointer;" onclick="toggleReplies(${t.id})">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                    <span style="font-size:13px;font-weight:600;color:var(--text);">${escapeHtmlF(t.author.name)}</span>
+                    <span class="badge bg-primary">${escapeHtmlF(t.category)}</span>
+                    <span style="font-size:12px;color:var(--text3);">${timeAgo}</span>
+                  </div>
+                  <h5 style="font-size:15px;margin-bottom:6px;">${escapeHtmlF(t.title)}</h5>
+                  <p style="font-size:13px;color:var(--text2);">${escapeHtmlF(t.body)}</p>
+                  ${postImage}
+                  <div style="display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--text3);">
+                    <span id="reply-count-${t.id}"><i class="fa-solid fa-comment"></i> ${t.reply_count} ${t.reply_count === 1 ? 'Reply' : 'Replies'}</span>
+                  </div>
+                </div>
+                ${deleteBtn}
+              </div>
+
+              <div id="${replyId}" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+                <div id="dynamic-replies-${t.id}">
+                  <p class="muted" style="font-size:13px;text-align:center;padding:10px 0;">Loading replies...</p>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                  <input id="reply-input-${t.id}" class="form-control" placeholder="${token ? 'Write a reply...' : 'Login to reply'}" style="font-size:13px;" ${token ? '' : 'disabled'} onkeydown="if(event.key==='Enter')sendReply(${t.id})" />
+                  <button class="btn btn-primary btn-sm" onclick="${token ? `sendReply(${t.id})` : `window.location.href='login.html'`}">${token ? 'Send' : 'Login'}</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      /* ── Delete a thread (own posts only) ── */
+      async function deleteThread(threadId, btn) {
+        if (!token) { window.location.href = 'login.html'; return; }
+        if (!confirm('Delete this post? This cannot be undone.')) return;
+
+        const card = document.getElementById('thread-card-' + threadId);
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+        try {
+          const res = await fetch(`${API_BASE}/forum/${threadId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (!res.ok) {
+            if (res.status === 401) {
+              localStorage.removeItem('ss_token');
+              localStorage.removeItem('ss_user');
+              window.location.href = 'login.html';
+              return;
+            }
+            let msg = 'Failed to delete post.';
+            try { const data = await res.json(); msg = data.detail || msg; } catch (e) {}
+            alert(msg);
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+            return;
+          }
+
+          if (card) {
+            card.style.transition = 'all 0.3s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(20px)';
+            setTimeout(() => {
+              allThreads = allThreads.filter(t => t.id !== threadId);
+              renderThreads();
+              renderTopContributors();
+            }, 300);
+          }
+
+        } catch (err) {
+          alert('Could not connect to server.');
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+        }
+      }
+
+      /* ── Toggle replies open/close, load on first open ── */
+      const loadedReplies = new Set();
+
+      async function toggleReplies(threadId) {
+        const section = document.getElementById('replies-' + threadId);
+        const isOpen = section.style.display === 'block';
+        section.style.display = isOpen ? 'none' : 'block';
+
+        if (!isOpen && !loadedReplies.has(threadId)) {
+          await loadReplies(threadId);
+          loadedReplies.add(threadId);
+        }
+
+        if (!isOpen) {
+          const input = document.getElementById('reply-input-' + threadId);
+          if (input && !input.disabled) setTimeout(() => input.focus(), 50);
+        }
+      }
+
+      /* ── Load replies for a thread ── */
+      async function loadReplies(threadId) {
+        const container = document.getElementById('dynamic-replies-' + threadId);
+        try {
+          const res = await fetch(`${API_BASE}/forum/${threadId}`);
+          const data = await res.json();
+          if (!res.ok) {
+            container.innerHTML = '<p class="muted" style="font-size:13px;">Could not load replies.</p>';
+            return;
+          }
+
+          if (!data.replies || data.replies.length === 0) {
+            container.innerHTML = '<p class="muted" style="font-size:13px;padding:6px 0;">No replies yet. Be the first to respond!</p>';
+            return;
+          }
+
+          container.innerHTML = data.replies.map(r => {
+            const initials = r.author.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+            const timeAgo = formatTimeAgo(r.created_at);
+            return `
+              <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;">
+                  <div style="font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text);">${escapeHtmlF(r.author.name)} <span style="font-weight:400;color:var(--text3);">· ${timeAgo}</span></div>
+                  <p style="font-size:13px;color:var(--text2);margin:0;">${escapeHtmlF(r.body)}</p>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+        } catch (err) {
+          container.innerHTML = '<p class="muted" style="font-size:13px;">Could not connect to server.</p>';
+        }
+      }
+
+      /* ── Send a reply ── */
+      async function sendReply(threadId) {
+        if (!token) { window.location.href = 'login.html'; return; }
+
+        const input = document.getElementById('reply-input-' + threadId);
+        const text = input.value.trim();
+
+        if (!text) {
+          input.style.borderColor = '#ef4444';
+          input.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.18)';
+          setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 1500);
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/forum/${threadId}/reply`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ body: text })
+          });
+
+          if (!res.ok) {
+            const data = await res.json();
+            if (res.status === 401) {
+              localStorage.removeItem('ss_token');
+              localStorage.removeItem('ss_user');
+              window.location.href = 'login.html';
+              return;
+            }
+            alert(data.detail || 'Failed to post reply.');
+            return;
+          }
+
+          input.value = '';
+          loadedReplies.delete(threadId);
+          await loadReplies(threadId);
+          loadedReplies.add(threadId);
+
+          // Update reply count
+          const thread = allThreads.find(t => t.id === threadId);
+          if (thread) {
+            thread.reply_count += 1;
+            const countEl = document.getElementById('reply-count-' + threadId);
+            if (countEl) countEl.innerHTML = `<i class="fa-solid fa-comment"></i> ${thread.reply_count} ${thread.reply_count === 1 ? 'Reply' : 'Replies'}`;
+          }
+
+        } catch (err) {
+          alert('Could not connect to server.');
+        }
+      }
+
+      let selectedImageFile = null;
+
+      function handleImagePreview(input) {
+        const file = input.files[0];
+        if (!file) return;
+        selectedImageFile = file;
+
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById('image-preview').src = e.target.result;
+          document.getElementById('image-preview-wrap').style.display = 'block';
+          document.getElementById('image-picker-btn').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function clearImagePreview() {
+        selectedImageFile = null;
+        document.getElementById('new-post-image').value = '';
+        document.getElementById('image-preview-wrap').style.display = 'none';
+        document.getElementById('image-picker-btn').style.display = 'inline-flex';
+      }
+
+      /* ── New Post Form ── */
+      function toggleNewPostForm() {
+        if (!token) { window.location.href = 'login.html'; return; }
+        const form = document.getElementById('new-post-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') document.getElementById('new-post-title').focus();
+      }
+
+      function showFormMessage(text, type) {
+        const box = document.getElementById('form-message');
+        box.textContent = text;
+        box.style.display = 'block';
+        if (type === 'error') {
+          box.style.background = 'rgba(239,68,68,0.12)';
+          box.style.color = '#f87171';
+          box.style.border = '1px solid rgba(239,68,68,0.25)';
+        } else {
+          box.style.background = 'rgba(16,185,129,0.12)';
+          box.style.color = '#34d399';
+          box.style.border = '1px solid rgba(16,185,129,0.25)';
+        }
+      }
+
+      /* ── Post new thread ── */
+      async function postThread() {
+        if (!token) { window.location.href = 'login.html'; return; }
+
+        const title = document.getElementById('new-post-title').value.trim();
+        const body  = document.getElementById('new-post-body').value.trim();
+        const category = document.getElementById('new-post-category').value;
+
+        if (!title || !body) {
+          [document.getElementById('new-post-title'), document.getElementById('new-post-body')].forEach(el => {
+            if (!el.value.trim()) {
+              el.style.borderColor = '#ef4444';
+              el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.18)';
+              setTimeout(() => { el.style.borderColor=''; el.style.boxShadow=''; }, 1800);
+            }
+          });
+          showFormMessage('Please fill in both title and message.', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('post-thread-btn');
+        btn.disabled = true;
+        btn.textContent = 'Posting...';
+
+        try {
+          const res = await fetch(`${API_BASE}/forum/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ title, body, category })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            if (res.status === 401) {
+              localStorage.removeItem('ss_token');
+              localStorage.removeItem('ss_user');
+              window.location.href = 'login.html';
+              return;
+            }
+            showFormMessage(data.detail || 'Failed to post.', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Post';
+            return;
+          }
+
+          // Add new thread to top of list
+          let newThread = data;
+
+          // If an image was selected, upload it now and attach the URL
+          if (selectedImageFile) {
+            try {
+              const formData = new FormData();
+              formData.append('file', selectedImageFile);
+              const imgRes = await fetch(`${API_BASE}/forum/${data.id}/upload-image`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+              });
+              const imgData = await imgRes.json();
+              if (imgRes.ok) {
+                newThread = { ...data, image_url: imgData.image_url };
+              }
+            } catch (err) {
+              console.error('Image upload failed', err);
+            }
+          }
+
+          allThreads.unshift(newThread);
+          renderThreads();
+          renderTopContributors();
+
+          document.getElementById('new-post-title').value = '';
+          document.getElementById('new-post-body').value = '';
+          clearImagePreview();
+          document.getElementById('new-post-form').style.display = 'none';
+          document.getElementById('form-message').style.display = 'none';
+          btn.disabled = false;
+          btn.textContent = 'Post';
+
+        } catch (err) {
+          showFormMessage('Could not connect to server.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Post';
+        }
+      }
+
+      /* ── Tab switching (sort) ── */
+      function setTab(btn, type) {
+        document.querySelectorAll('.forum-tab').forEach(t => {
+          t.style.background = 'transparent';
+          t.style.color = 'var(--text2)';
+          t.style.fontWeight = '400';
+        });
+        btn.style.background = 'var(--accent-grad)';
+        btn.style.color = '#fff';
+        btn.style.fontWeight = '600';
+        currentSort = type;
+        renderThreads();
+      }
+
+      /* ── Category filter tags ── */
+      document.querySelectorAll('.category-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+          tag.classList.add('active');
+          activeCategory = tag.dataset.cat;
+          renderThreads();
+        });
+      });
+
+      /* ── Top contributors — derived from thread authors ── */
+      function renderTopContributors() {
+        const counts = {};
+        allThreads.forEach(t => {
+          const name = t.author.name;
+          if (!counts[name]) counts[name] = { count: 0, replies: 0 };
+          counts[name].count += 1;
+          counts[name].replies += t.reply_count;
+        });
+
+        const sorted = Object.entries(counts)
+          .sort((a, b) => (b[1].count + b[1].replies) - (a[1].count + a[1].replies))
+          .slice(0, 3);
+
+        const medalIcons = [
+          '<i class="fa-solid fa-medal" style="color:#facc15;"></i>',
+          '<i class="fa-solid fa-medal" style="color:#cbd5e1;"></i>',
+          '<i class="fa-solid fa-medal" style="color:#d97706;"></i>'
+        ];
+        const container = document.getElementById('top-contributors');
+
+        if (sorted.length === 0) {
+          container.innerHTML = '<p class="muted" style="font-size:13px;">No posts yet.</p>';
+          return;
+        }
+
+        container.innerHTML = sorted.map(([name, stats], i) => {
+          const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+          return `
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">${initials}</div>
+              <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;color:var(--text);">${escapeHtmlF(name)}</div>
+                <div style="font-size:12px;color:var(--text3);">${stats.count} post${stats.count !== 1 ? 's' : ''} · ${stats.replies} repl${stats.replies !== 1 ? 'ies' : 'y'}</div>
+              </div>
+              <span style="font-size:18px;">${medalIcons[i]}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      /* ── Helpers ── */
+      function escapeHtmlF(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+      }
+
+      function formatTimeAgo(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`;
+        if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+        if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+        return date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+      }
+
+      loadThreads();
+    </script>
+  </body>
+</html>

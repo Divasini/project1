@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Startup Ideas | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .feed-wrap { max-width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+    .feed-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 30px 32px; position: relative; }
+    .feed-card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .feed-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--accent-grad); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 22px; flex-shrink: 0; }
+    .feed-author { font-size: 20px; font-weight: 600; margin: 0; }
+    .feed-meta { font-size: 16px; color: var(--text3); margin: 0; }
+    .feed-bio { font-size: 16px; color: var(--text2); margin: 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+    .feed-cat-badge { margin-left: auto; font-size: 15px; padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.06); color: var(--accent2); white-space: nowrap; }
+    .feed-title { font-size: 28px; font-weight: 700; margin: 0 0 12px; }
+    .feed-summary { font-size: 18px; color: var(--text2); line-height: 1.7; margin: 0 0 18px; white-space: pre-line; }
+    .feed-cover { width: 100%; max-height: 320px; object-fit: cover; border-radius: 10px; margin-bottom: 16px; display: block; }
+    .feed-footer { display: flex; align-items: center; gap: 34px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 19px; color: var(--text3); }
+    .feed-action { display: flex; align-items: center; gap: 9px; background: none; border: none; cursor: pointer; color: inherit; padding: 0; font-size: 19px; transition: color 0.15s, transform 0.15s; }
+    .feed-action i { font-size: 23px; }
+    .feed-viewdetails { margin-left: auto; font-size: 17px !important; padding: 12px 26px !important; }
+
+    /* Top section */
+    .glass-card h2 { font-size: 32px; }
+    .glass-card p.muted { font-size: 18px; }
+    #search-input { font-size: 14px !important; padding: 10px 16px !important; border-radius: 10px !important; }
+    .ideas-view-tab { font-size: 13px !important; padding: 8px 16px !important; }
+    #category-filter-select { font-size: 13px !important; padding: 8px 14px !important; border-radius: 10px !important; height:auto; }
+
+    /* Double-tap heart pop animation */
+    .dbl-tap-pop {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0);
+      font-size: 90px; color: #3b82f6; pointer-events: none; z-index: 10;
+      animation: dblTapPop 0.7s ease forwards;
+    }
+    @keyframes dblTapPop {
+      0%   { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+      30%  { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+      50%  { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+    }
+    .feed-action:hover { color: var(--accent2); }
+    .feed-action.liked { color: #3b82f6; }
+    .feed-action.bookmarked { color: var(--accent2); }
+    .container.section {
+      max-width: 100% !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 30px;
+    }
+
+    /* Comment side panel — Instagram/LinkedIn style slide-in from the right */
+    #comment-modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.55);
+    }
+    #comment-modal {
+      position: fixed; top: 0; right: 0; height: 100%;
+      width: 420px; max-width: 92vw;
+      background: var(--bg2); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      box-shadow: -8px 0 30px rgba(0,0,0,0.35);
+    }
+    #comment-modal-backdrop.open #comment-modal { transform: translateX(0); }
+    #comment-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    #comment-modal-header h5 { margin: 0; font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #comment-modal-close {
+      background: var(--card); border: 1px solid var(--border); border-radius: 50%;
+      width: 30px; height: 30px; color: var(--text2); cursor: pointer; font-size: 14px; flex-shrink: 0; margin-left: 10px;
+    }
+    #comment-list {
+      flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px;
+    }
+    .comment-row { display: flex; gap: 10px; }
+    .comment-avatar {
+      width: 34px; height: 34px; border-radius: 50%; background: var(--accent-grad);
+      display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+      color: #fff; flex-shrink: 0;
+    }
+    .comment-body-wrap { flex: 1; min-width: 0; }
+    .comment-body-wrap .comment-author-line { font-size: 13px; color: var(--text); }
+    .comment-body-wrap .comment-author-line strong { font-weight: 600; }
+    .comment-body-wrap .comment-text { font-size: 13.5px; color: var(--text2); line-height: 1.5; margin-top: 2px; word-wrap: break-word; }
+    .comment-body-wrap .comment-time { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    #comment-modal-footer {
+      display: flex; align-items: center; gap: 10px; padding: 14px 20px;
+      border-top: 1px solid var(--border); flex-shrink: 0;
+    }
+    #comment-input-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--accent-grad);
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+      color: #fff; flex-shrink: 0;
+    }
+    #comment-input {
+      flex: 1; font-size: 13px; background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 9px 16px;
+    }
+    #comment-submit-btn {
+      border-radius: 20px; padding: 8px 16px; flex-shrink: 0;
+    }
+    @media (max-width: 480px) {
+      #comment-modal {
+        width: 100%; max-width: 100%;
+        border-left: none;
+      }
+      #comment-modal-header { padding: 14px 16px; }
+      #comment-list { padding: 14px 16px; gap: 16px; }
+      #comment-modal-footer { padding: 12px 16px; }
+      #comment-submit-btn span { display: none; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <button class="hamburger-btn" onclick="toggleMobileNav(this)">☰</button>
+    <div class="nav-menu" id="mobile-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="ideas.html" class="active"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+      <a href="forum.html"><i class="fa-solid fa-users"></i> Community</a>
+      <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <a href="login.html" class="login-btn">Login</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+      <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn">🌙</button>
+      <a href="messages.html" class="messages-nav-icon" title="Messages"><i class="fa-solid fa-comments"></i></a>
+    </div>
+  </div>
+</nav>
+
+<div class="container section" style="position:relative;z-index:1;">
+
+  <div class="glass-card mb-4" style="animation:fadeUp 0.6s ease both;margin:0 auto 24px;">
+    <h2><i class="fa-solid fa-lightbulb"></i> Explore Startup Ideas</h2>
+    <p class="muted">Discover trending startup ideas from innovators worldwide.</p>
+  </div>
+
+  <div style="display:flex;align-items:center;flex-wrap:nowrap;gap:12px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px;">
+
+    <input class="form-control" id="search-input" placeholder="Search startup ideas..." style="flex:1;min-width:180px;">
+
+    <div style="display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:5px;flex-shrink:0;">
+      <button class="ideas-view-tab active" id="tab-all" onclick="switchView('all', this)" style="border:none;background:var(--accent-grad);color:#fff;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;"><i class="fa-solid fa-lightbulb"></i> All Ideas</button>
+      <button class="ideas-view-tab" id="tab-trending" onclick="switchView('trending', this)" style="border:none;background:transparent;color:var(--text2);border-radius:8px;cursor:pointer;white-space:nowrap;"><i class="fa-solid fa-fire"></i> Trending</button>
+      <button class="ideas-view-tab" id="tab-newest" onclick="switchView('newest', this)" style="border:none;background:transparent;color:var(--text2);border-radius:8px;cursor:pointer;white-space:nowrap;"><i class="fa-solid fa-clock"></i> Newest</button>
+    </div>
+
+    <select class="form-control" id="category-filter-select" style="width:150px;flex-shrink:0;">
+      <option value="">All Categories</option>
+      <option value="AI">AI</option>
+      <option value="Education">Education</option>
+      <option value="Finance">Finance</option>
+      <option value="Healthcare">Healthcare</option>
+      <option value="Green">Green</option>
+      <option value="Marketplace">Marketplace</option>
+    </select>
+
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-state" style="text-align:center;padding:60px 0;color:var(--text3);">
+    <div style="font-size:32px;margin-bottom:12px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    Loading ideas...
+  </div>
+
+  <!-- FEED -->
+  <div class="feed-wrap" id="ideas-grid" style="display:none;"></div>
+
+  <!-- No results message -->
+  <div id="no-results" style="display:none;text-align:center;padding:48px 0;color:var(--text3);">
+    <div style="font-size:48px;margin-bottom:12px;"><i class="fa-solid fa-magnifying-glass"></i></div>
+    <p>No ideas found. Try a different search.</p>
+  </div>
+
+  <!-- LOAD MORE -->
+  <div id="load-more-wrap" style="display:none;text-align:center;padding:32px 0;">
+    <button class="btn btn-primary" id="load-more-btn" onclick="loadMoreIdeas()">Load More Ideas</button>
+  </div>
+
+</div>
+
+<!-- ── COMMENT SIDE PANEL ── -->
+<div id="comment-modal-backdrop" onclick="if(event.target===this) closeCommentModal()">
+  <div id="comment-modal">
+    <div id="comment-modal-header">
+      <h5 id="comment-modal-title"><i class="fa-regular fa-comment"></i> Comments</h5>
+      <button id="comment-modal-close" onclick="closeCommentModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="comment-list"></div>
+    <div id="comment-modal-footer">
+      <div id="comment-input-avatar">Me</div>
+      <input id="comment-input" placeholder="Write a comment..." onkeydown="if(event.key==='Enter') submitComment()">
+      <button class="btn btn-primary btn-sm" id="comment-submit-btn" onclick="submitComment()">Post</button>
+    </div>
+  </div>
+</div>
+
+<footer><p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script>
+  const API_BASE = "http://localhost:8000";
+  const token = localStorage.getItem('ss_token');
+
+  let allIdeas = [];
+  let activeCat = '';
+  let currentPage = 1;
+  let currentView = 'all'; // all | trending | newest
+
+  // ── Current logged-in user id (for hiding "Chat" on your own ideas) ──
+  function getMyUserId() {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id;
+    } catch (e) {
+      return null;
+    }
+  }
+  const myUserId = getMyUserId();
+
+  // ── Chat with an idea's author ──
+  function chatWithAuthor(authorId, authorName) {
+    if (!token) { window.location.href = 'login.html'; return; }
+    window.location.href = `messages.html?user=${authorId}&name=${encodeURIComponent(authorName)}`;
+  }
+
+  /* ── Switch between All / Trending / Newest views ── */
+  async function switchView(view, btn) {
+    currentView = view;
+    currentPage = 1;
+    allIdeas = [];
+
+    document.querySelectorAll('.ideas-view-tab').forEach(t => {
+      t.style.background = 'transparent';
+      t.style.color = 'var(--text2)';
+      t.style.fontWeight = '400';
+    });
+    btn.style.background = 'var(--accent-grad)';
+    btn.style.color = '#fff';
+    btn.style.fontWeight = '600';
+
+    // Search bar + category dropdown stay visible & fixed in place
+    // regardless of which tab (All / Trending / Newest) is active.
+    const loadMoreWrap = document.getElementById('load-more-wrap');
+
+    if (view === 'trending') {
+      if (loadMoreWrap) loadMoreWrap.style.display = 'none';
+      await loadTrending();
+    } else {
+      await loadIdeas(1, false, view === 'newest' ? 'newest' : 'all');
+    }
+  }
+
+  /* ── Load Trending Ideas ── */
+  async function loadTrending() {
+    document.getElementById('loading-state').style.display = 'block';
+    document.getElementById('ideas-grid').style.display = 'none';
+
+    try {
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/ideas/trending?limit=20`, { headers });
+      const data = await res.json();
+
+      if (!res.ok) {
+        document.getElementById('loading-state').innerHTML = '<p style="color:#f87171;">Failed to load trending ideas.</p>';
+        return;
+      }
+
+      allIdeas = data;
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('ideas-grid').style.display = 'flex';
+      document.getElementById('no-results').style.display = data.length === 0 ? 'block' : 'none';
+      renderIdeas();
+
+    } catch (err) {
+      document.getElementById('loading-state').innerHTML = '<p style="color:#f87171;">Could not connect to server.</p>';
+    }
+  }
+  let totalPages = 1;
+  let isLoadingMore = false;
+
+  // Category icon map (Font Awesome classes)
+  const catIcons = {
+    AI: 'fa-robot', Education: 'fa-graduation-cap', Finance: 'fa-sack-dollar', Healthcare: 'fa-heart-pulse',
+    Green: 'fa-leaf', Marketplace: 'fa-store', 'E-Commerce': 'fa-bag-shopping', Other: 'fa-lightbulb'
+  };
+
+  async function loadIdeas(page = 1, append = false, sort = 'all') {
+    try {
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const params = new URLSearchParams({ page, page_size: 12 });
+      if (activeCat) params.set('category', activeCat);
+      const query = document.getElementById('search-input').value.trim();
+      if (query) params.set('search', query);
+      if (sort === 'newest') params.set('sort', 'newest');
+
+      const res = await fetch(`${API_BASE}/ideas/?${params.toString()}`, { headers });
+      const data = await res.json();
+
+      if (!res.ok) {
+        document.getElementById('loading-state').innerHTML =
+          '<p style="color:#f87171;">Failed to load ideas.</p>';
+        return;
+      }
+
+      currentPage = data.page;
+      totalPages = data.total_pages;
+
+      allIdeas = append ? allIdeas.concat(data.items) : data.items;
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('ideas-grid').style.display = 'flex';
+      renderIdeas();
+      renderLoadMoreButton();
+
+    } catch (err) {
+      document.getElementById('loading-state').innerHTML =
+        '<p style="color:#f87171;">Could not connect to server. Is the backend running?</p>';
+    }
+  }
+
+  function timeAgo(dateStr) {
+    const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 2592000) return Math.floor(diff / 86400) + 'd ago';
+    return new Date(dateStr).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function renderIdeas() {
+    const grid = document.getElementById('ideas-grid');
+
+    document.getElementById('no-results').style.display = allIdeas.length === 0 ? 'block' : 'none';
+
+    grid.innerHTML = allIdeas.map((idea, index) => {
+      const icon = catIcons[idea.category] || 'fa-lightbulb';
+      const lockIcon = idea.has_access ? '' : '<i class="fa-solid fa-lock" style="font-size:11px;color:var(--text3);margin-left:6px;" title="Full details locked"></i>';
+      const likedClass = idea.liked ? 'liked' : '';
+      const bookmarkedClass = idea.bookmarked ? 'bookmarked' : '';
+      const coverImg = idea.cover_image_url
+        ? `<img src="${API_BASE}${idea.cover_image_url}" alt="" class="feed-cover">`
+        : '';
+
+      const authorInitials = idea.author.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const authorAvatar = idea.author.avatar_url
+        ? `<div class="feed-avatar" style="background-image:url('${API_BASE}${idea.author.avatar_url}');background-size:cover;background-position:center;"></div>`
+        : `<div class="feed-avatar">${authorInitials}</div>`;
+
+      let trendingBadge = '';
+      if (currentView === 'trending' && index < 3) {
+        const rankColors = ['linear-gradient(135deg,#f59e0b,#d97706)', 'linear-gradient(135deg,#9ca3af,#6b7280)', 'linear-gradient(135deg,#cd7f32,#a0522d)'];
+        const rankIcons = ['fa-trophy', 'fa-medal', 'fa-medal'];
+        trendingBadge = `<div style="position:absolute;top:-8px;left:16px;background:${rankColors[index]};color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;"><i class="fa-solid ${rankIcons[index]}"></i> #${index + 1} Trending</div>`;
+      }
+
+      const bioLine = idea.author.bio && idea.author.bio.trim()
+        ? escapeHtml(idea.author.bio.split('\n')[0].slice(0, 60))
+        : '';
+
+      // ── Chat button: hidden only when it's the logged-in user's own idea ──
+      // Requires idea.author.id in the API response.
+      const isOwnIdea = myUserId && idea.author.id && idea.author.id === myUserId;
+      const chatBtn = isOwnIdea ? '' : `
+            <button class="feed-action" onclick='chatWithAuthor(${idea.author.id}, ${JSON.stringify(idea.author.name)})'>
+              <i class="fa-regular fa-comments"></i> Chat
+            </button>`;
+
+      return `
+        <div class="feed-card" ondblclick="handleDoubleTapLike(event, ${idea.id})">
+          ${trendingBadge}
+          <div class="feed-card-header">
+            ${authorAvatar}
+            <div style="min-width:0;flex:1;">
+              <p class="feed-author">${escapeHtml(idea.author.name)}</p>
+              ${bioLine ? `<p class="feed-bio">${bioLine}</p>` : ''}
+              <p class="feed-meta">${timeAgo(idea.created_at)}</p>
+            </div>
+            <span class="feed-cat-badge"><i class="fa-solid ${icon}"></i> ${idea.category}</span>
+          </div>
+
+          <h5 class="feed-title">${escapeHtml(idea.title)}${lockIcon}</h5>
+          <p class="feed-summary">${escapeHtml(idea.problem || idea.summary || 'Tap to view this idea.')}</p>
+          ${coverImg}
+
+          <div class="feed-footer">
+            <button class="feed-action card-like-btn ${likedClass}" data-id="${idea.id}" onclick="toggleLikeCard(${idea.id}, this)">
+              <i class="fa-${idea.liked ? 'solid' : 'regular'} fa-thumbs-up like-emoji"></i> <span class="like-count-text">${idea.like_count}</span>
+            </button>
+            <button class="feed-action" onclick='openCommentModal(${idea.id}, ${JSON.stringify(idea.title)})'>
+              <i class="fa-regular fa-comment"></i> <span class="comment-count-text" data-comment-count-for="${idea.id}">${idea.comment_count || 0}</span>
+            </button>
+            <button class="feed-action" onclick="shareIdea(${idea.id}, this)">
+              <i class="fa-solid fa-share"></i> <span class="share-count-text">${idea.share_count || 0}</span>
+            </button>${chatBtn}
+            <button class="feed-action card-bookmark-btn ${bookmarkedClass}" data-id="${idea.id}" onclick="toggleBookmarkCard(${idea.id}, this)">
+              <i class="fa-${idea.bookmarked ? 'solid' : 'regular'} fa-bookmark"></i>
+            </button>
+            <a href="idea-details.html?id=${idea.id}" class="feed-viewdetails btn btn-primary btn-sm">View Details</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ── Double-tap to like (Instagram style) ── */
+  function handleDoubleTapLike(event, ideaId) {
+    if (event.target.closest('button') || event.target.closest('a')) return;
+
+    const card = event.currentTarget;
+
+    const pop = document.createElement('i');
+    pop.className = 'fa-solid fa-thumbs-up dbl-tap-pop';
+    card.appendChild(pop);
+    setTimeout(() => pop.remove(), 700);
+
+    const likeBtn = card.querySelector('.card-like-btn');
+    if (likeBtn && !likeBtn.classList.contains('liked')) {
+      toggleLikeCard(ideaId, likeBtn);
+    }
+  }
+
+  /* ── Share — copies link AND records the share on the backend ── */
+  async function shareIdea(ideaId, btn) {
+    const url = `${window.location.origin}${window.location.pathname.replace('ideas.html','idea-details.html')}?id=${ideaId}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (e) {
+      // clipboard may fail (older browsers) — still record the share
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}/share`, {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const idea = allIdeas.find(i => i.id === ideaId);
+        if (idea) idea.share_count = data.share_count;
+        if (btn) {
+          const countEl = btn.querySelector('.share-count-text');
+          if (countEl) countEl.textContent = data.share_count;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    alert('Link copied to clipboard!');
+  }
+
+  /* ── Like toggle directly from card ── */
+  async function toggleLikeCard(ideaId, btn) {
+    if (!token) { window.location.href = 'login.html'; return; }
+
+    btn.style.transform = 'scale(1.08)';
+    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
+
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}/like`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) { window.location.href = 'login.html'; }
+        return;
+      }
+
+      const idea = allIdeas.find(i => i.id === ideaId);
+      if (idea) {
+        idea.liked = data.liked;
+        idea.like_count = data.likes;
+      }
+
+      btn.classList.toggle('liked', data.liked);
+      const likeIcon = btn.querySelector('.like-emoji');
+      likeIcon.className = `fa-${data.liked ? 'solid' : 'regular'} fa-thumbs-up like-emoji`;
+      btn.querySelector('.like-count-text').textContent = data.likes;
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  /* ── Bookmark toggle directly from card ── */
+  async function toggleBookmarkCard(ideaId, btn) {
+    if (!token) { window.location.href = 'login.html'; return; }
+
+    btn.style.transform = 'scale(1.08)';
+    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 150);
+
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}/bookmark`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) { window.location.href = 'login.html'; }
+        return;
+      }
+
+      const idea = allIdeas.find(i => i.id === ideaId);
+      if (idea) idea.bookmarked = data.bookmarked;
+
+      btn.classList.toggle('bookmarked', data.bookmarked);
+      btn.innerHTML = `<i class="fa-${data.bookmarked ? 'solid' : 'regular'} fa-bookmark"></i>`;
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // ── Category dropdown ──
+  document.getElementById('category-filter-select').addEventListener('change', function() {
+    activeCat = this.value;
+    loadIdeas(1, false, currentView);
+  });
+
+  // ── Debounced search ──
+  let searchDebounceTimer = null;
+  document.getElementById('search-input').addEventListener('input', function() {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => loadIdeas(1, false, currentView), 400);
+  });
+
+  // ── Load More button ──
+  function renderLoadMoreButton() {
+    const wrap = document.getElementById('load-more-wrap');
+    if (currentPage < totalPages && currentView !== 'trending') {
+      wrap.style.display = 'block';
+    } else {
+      wrap.style.display = 'none';
+    }
+  }
+
+  async function loadMoreIdeas() {
+    if (isLoadingMore || currentPage >= totalPages) return;
+    isLoadingMore = true;
+    const btn = document.getElementById('load-more-btn');
+    btn.disabled = true;
+    btn.textContent = 'Loading...';
+
+    await loadIdeas(currentPage + 1, true, currentView);
+
+    btn.disabled = false;
+    btn.textContent = 'Load More Ideas';
+    isLoadingMore = false;
+  }
+
+  loadIdeas(1, false, 'all');
+
+  /* ══════════════════ COMMENT MODAL ══════════════════ */
+  let activeCommentIdeaId = null;
+
+  function openCommentModal(ideaId, ideaTitle) {
+    activeCommentIdeaId = ideaId;
+    document.getElementById('comment-modal-title').innerHTML =
+      `<i class="fa-regular fa-comment"></i> ${escapeHtml(ideaTitle)}`;
+    document.getElementById('comment-list').innerHTML =
+      '<p class="muted" style="text-align:center;font-size:13px;padding:20px 0;">Loading comments...</p>';
+    document.getElementById('comment-input').value = '';
+    document.getElementById('comment-input').disabled = !token;
+    document.getElementById('comment-input').placeholder = token ? 'Write a comment...' : 'Login to comment';
+
+    // Show my own initials next to the input bar
+    const avatarEl = document.getElementById('comment-input-avatar');
+    if (token) {
+      try {
+        const userStr = localStorage.getItem('ss_user');
+        const me = userStr ? JSON.parse(userStr) : null;
+        avatarEl.textContent = me ? me.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) : 'Me';
+      } catch (e) { avatarEl.textContent = 'Me'; }
+    } else {
+      avatarEl.textContent = '?';
+    }
+
+    const backdrop = document.getElementById('comment-modal-backdrop');
+    backdrop.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    // Trigger the slide-in on the next frame so the transition plays
+    requestAnimationFrame(() => backdrop.classList.add('open'));
+
+    loadComments(ideaId);
+  }
+
+  function closeCommentModal() {
+    const backdrop = document.getElementById('comment-modal-backdrop');
+    backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+    activeCommentIdeaId = null;
+    setTimeout(() => { backdrop.style.display = 'none'; }, 280);
+  }
+
+  async function loadComments(ideaId) {
+    const list = document.getElementById('comment-list');
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${ideaId}/comments`);
+      const comments = await res.json();
+      if (!res.ok) {
+        list.innerHTML = '<p class="muted" style="text-align:center;font-size:13px;padding:20px 0;">Could not load comments.</p>';
+        return;
+      }
+
+      if (comments.length === 0) {
+        list.innerHTML = '<p class="muted" style="text-align:center;font-size:13px;padding:20px 0;">No comments yet. Be the first to comment!</p>';
+        return;
+      }
+
+      list.innerHTML = comments.map(c => {
+        const initials = c.user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        return `
+          <div class="comment-row">
+            <div class="comment-avatar">${initials}</div>
+            <div class="comment-body-wrap">
+              <div class="comment-author-line"><strong>${escapeHtml(c.user.name)}</strong></div>
+              <div class="comment-text">${escapeHtml(c.body)}</div>
+              <div class="comment-time">${timeAgo(c.created_at)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      list.scrollTop = list.scrollHeight;
+
+    } catch (err) {
+      list.innerHTML = '<p class="muted" style="text-align:center;font-size:13px;padding:20px 0;">Could not connect to server.</p>';
+    }
+  }
+
+  async function submitComment() {
+    if (!token) { window.location.href = 'login.html'; return; }
+    if (!activeCommentIdeaId) return;
+
+    const input = document.getElementById('comment-input');
+    const text = input.value.trim();
+    if (!text) {
+      input.style.borderColor = '#ef4444';
+      setTimeout(() => { input.style.borderColor = ''; }, 1200);
+      return;
+    }
+
+    const btn = document.getElementById('comment-submit-btn');
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${API_BASE}/ideas/${activeCommentIdeaId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ body: text })
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.detail || 'Failed to post comment.');
+        btn.disabled = false;
+        return;
+      }
+
+      input.value = '';
+      await loadComments(activeCommentIdeaId);
+
+      // Update the comment count on the feed card
+      const idea = allIdeas.find(i => i.id === activeCommentIdeaId);
+      if (idea) {
+        idea.comment_count = (idea.comment_count || 0) + 1;
+        const countEl = document.querySelector(`[data-comment-count-for="${activeCommentIdeaId}"]`);
+        if (countEl) countEl.textContent = idea.comment_count;
+      }
+
+    } catch (err) {
+      alert('Could not connect to server.');
+    }
+
+    btn.disabled = false;
+  }
+</script>
+</body>
+</html>

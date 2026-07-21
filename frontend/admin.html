@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-sm" style="background:var(--card);border:1px solid var(--border);color:var(--text2);"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+      <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container section">
+
+  <!-- ACCESS DENIED -->
+  <div id="access-denied" style="display:none;text-align:center;padding:80px 0;">
+    <div style="font-size:48px;margin-bottom:16px;color:#f87171;"><i class="fa-solid fa-ban"></i></div>
+    <h3>Admin Access Required</h3>
+    <p class="muted">You don't have permission to view this page.</p>
+    <a href="dashboard.html" class="btn btn-primary" style="margin-top:16px;">Go to Dashboard</a>
+  </div>
+
+  <div id="admin-content" style="display:none;">
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap;">
+      <div style="font-size:32px;"><i class="fa-solid fa-shield-halved"></i></div>
+      <div>
+        <h2 style="margin:0;">Admin Panel</h2>
+        <p class="muted" style="margin:0;font-size:13px;">Manage users, ideas and platform health.</p>
+      </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-2">
+        <div class="glass-card text-center" style="padding:16px;">
+          <div style="font-size:24px;font-weight:800;background:var(--accent-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="stat-users">—</div>
+          <p class="muted" style="font-size:12px;margin:4px 0 0;">Users</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="glass-card text-center" style="padding:16px;">
+          <div style="font-size:24px;font-weight:800;background:var(--accent-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;;" id="stat-ideas">—</div>
+          <p class="muted" style="font-size:12px;margin:4px 0 0;">Ideas</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="glass-card text-center" style="padding:16px;">
+          <div style="font-size:24px;font-weight:800;background:var(--accent-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="stat-threads">—</div>
+          <p class="muted" style="font-size:12px;margin:4px 0 0;">Threads</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="glass-card text-center" style="padding:16px;">
+          <div style="font-size:24px;font-weight:800;background:var(--accent-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="stat-likes">—</div>
+          <p class="muted" style="font-size:12px;margin:4px 0 0;">Likes</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="glass-card text-center" style="padding:16px;">
+          <div style="font-size:24px;font-weight:800;color:#f87171;" id="stat-banned">—</div>
+          <p class="muted" style="font-size:12px;margin:4px 0 0;">Banned</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="glass-card text-center" style="padding:16px;">
+          <div style="font-size:24px;font-weight:800;color:#fbbf24;" id="stat-drafts">—</div>
+          <p class="muted" style="font-size:12px;margin:4px 0 0;">Drafts</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;width:fit-content;">
+      <button class="admin-tab active" onclick="switchTab('users', this)" style="padding:8px 20px;border:none;background:var(--accent-grad);color:#fff;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600;"><i class="fa-solid fa-users"></i> Users</button>
+      <button class="admin-tab" onclick="switchTab('ideas', this)" style="padding:8px 20px;border:none;background:transparent;color:var(--text2);border-radius:9px;font-size:13px;cursor:pointer;"><i class="fa-solid fa-lightbulb"></i> Ideas</button>
+    </div>
+
+    <!-- USERS TABLE -->
+    <div id="tab-users">
+      <div class="glass-card" style="overflow-x:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <h5 style="margin:0;">All Users</h5>
+          <input id="user-search" class="form-control" placeholder="Search by name or email..." style="max-width:260px;font-size:13px;" oninput="filterUsers(this.value)">
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;" id="users-table">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);color:var(--text3);text-transform:uppercase;font-size:11px;letter-spacing:0.06em;">
+              <th style="padding:10px 12px;text-align:left;">User</th>
+              <th style="padding:10px 12px;text-align:left;">Email</th>
+              <th style="padding:10px 12px;text-align:center;">Verified</th>
+              <th style="padding:10px 12px;text-align:center;">Admin</th>
+              <th style="padding:10px 12px;text-align:center;">Status</th>
+              <th style="padding:10px 12px;text-align:center;">Joined</th>
+              <th style="padding:10px 12px;text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text3);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IDEAS TABLE -->
+    <div id="tab-ideas" style="display:none;">
+      <div class="glass-card" style="overflow-x:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <h5 style="margin:0;">All Ideas</h5>
+          <input id="idea-search" class="form-control" placeholder="Search by title..." style="max-width:260px;font-size:13px;" oninput="filterIdeas(this.value)">
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;" id="ideas-table">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);color:var(--text3);text-transform:uppercase;font-size:11px;letter-spacing:0.06em;">
+              <th style="padding:10px 12px;text-align:left;">Title</th>
+              <th style="padding:10px 12px;text-align:left;">Author</th>
+              <th style="padding:10px 12px;text-align:center;">Category</th>
+              <th style="padding:10px 12px;text-align:center;">Status</th>
+              <th style="padding:10px 12px;text-align:center;">Views</th>
+              <th style="padding:10px 12px;text-align:center;">Likes</th>
+              <th style="padding:10px 12px;text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ideas-tbody">
+            <tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text3);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end admin-content -->
+</div>
+
+<footer><p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script>
+  const API_BASE = "http://localhost:8000";
+  const token = localStorage.getItem('ss_token');
+  const userStr = localStorage.getItem('ss_user');
+
+  let allUsers = [];
+  let allIdeas = [];
+
+  // ── Check admin access ──
+  if (!token || !userStr) {
+    window.location.href = 'login.html';
+  } else {
+    const user = JSON.parse(userStr);
+    if (!user.is_admin) {
+      document.getElementById('access-denied').style.display = 'block';
+    } else {
+      document.getElementById('admin-content').style.display = 'block';
+      loadStats();
+      loadUsers();
+    }
+  }
+
+  /* ── Load Stats ── */
+  async function loadStats() {
+    try {
+      const res = await fetch(`${API_BASE}/admin/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+      document.getElementById('stat-users').textContent = data.total_users;
+      document.getElementById('stat-ideas').textContent = data.total_ideas;
+      document.getElementById('stat-threads').textContent = data.total_threads;
+      document.getElementById('stat-likes').textContent = data.total_likes;
+      document.getElementById('stat-banned').textContent = data.banned_users;
+      document.getElementById('stat-drafts').textContent = data.draft_ideas;
+    } catch (err) { console.error(err); }
+  }
+
+  /* ── Load Users ── */
+  async function loadUsers() {
+    try {
+      const res = await fetch(`${API_BASE}/admin/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+      allUsers = data;
+      renderUsers(allUsers);
+    } catch (err) { console.error(err); }
+  }
+
+  function renderUsers(users) {
+    const tbody = document.getElementById('users-tbody');
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text3);">No users found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => {
+      const initials = u.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const joinDate = new Date(u.created_at).toLocaleDateString('default', { month:'short', year:'numeric' });
+      const statusBadge = u.is_banned
+        ? `<span style="background:rgba(239,68,68,0.15);color:#f87171;padding:2px 8px;border-radius:20px;font-size:11px;">Banned</span>`
+        : `<span style="background:rgba(16,185,129,0.15);color:#34d399;padding:2px 8px;border-radius:20px;font-size:11px;">Active</span>`;
+      const adminBadge = u.is_admin
+        ? `<span style="background:var(--accent-grad);color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;">Admin</span>`
+        : '—';
+      const verifiedIcon = u.is_verified
+        ? '<i class="fa-solid fa-circle-check" style="color:#34d399;"></i>'
+        : '<i class="fa-solid fa-circle-xmark" style="color:#f87171;"></i>';
+
+      return `
+        <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:10px 12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:30px;height:30px;border-radius:50%;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${u.avatar_url ? `<img src="${API_BASE}${u.avatar_url}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;">` : initials}</div>
+              <span style="font-weight:600;color:var(--text);">${escapeH(u.name)}</span>
+            </div>
+          </td>
+          <td style="padding:10px 12px;color:var(--text2);">${escapeH(u.email)}</td>
+          <td style="padding:10px 12px;text-align:center;">${verifiedIcon}</td>
+          <td style="padding:10px 12px;text-align:center;">${adminBadge}</td>
+          <td style="padding:10px 12px;text-align:center;">${statusBadge}</td>
+          <td style="padding:10px 12px;text-align:center;color:var(--text3);">${joinDate}</td>
+          <td style="padding:10px 12px;text-align:center;">
+            <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+              <button onclick="toggleBan(${u.id}, '${escapeH(u.name)}', ${u.is_banned})" class="btn btn-sm" style="font-size:11px;padding:3px 8px;background:${u.is_banned ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${u.is_banned ? '#34d399' : '#f87171'};border:1px solid ${u.is_banned ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'};">
+                ${u.is_banned ? 'Unban' : 'Ban'}
+              </button>
+              <button onclick="toggleAdmin(${u.id}, '${escapeH(u.name)}', ${u.is_admin})" class="btn btn-sm" style="font-size:11px;padding:3px 8px;background:rgba(108,99,255,0.15);color:var(--accent2);border:1px solid rgba(108,99,255,0.3);">
+                ${u.is_admin ? 'Revoke Admin' : 'Make Admin'}
+              </button>
+              <button onclick="deleteUser(${u.id}, '${escapeH(u.name)}')" class="btn btn-sm btn-danger" style="font-size:11px;padding:3px 8px;">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function filterUsers(query) {
+    const q = query.toLowerCase();
+    renderUsers(allUsers.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)));
+  }
+
+  /* ── Load Ideas ── */
+  async function loadIdeas() {
+    if (allIdeas.length) { renderIdeas(allIdeas); return; }
+    try {
+      const res = await fetch(`${API_BASE}/admin/ideas`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+      allIdeas = data;
+      renderIdeas(allIdeas);
+    } catch (err) { console.error(err); }
+  }
+
+  function renderIdeas(ideas) {
+    const tbody = document.getElementById('ideas-tbody');
+    if (!ideas.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text3);">No ideas found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = ideas.map(idea => {
+      const statusBadge = idea.status === 'published'
+        ? `<span style="background:rgba(16,185,129,0.15);color:#34d399;padding:2px 8px;border-radius:20px;font-size:11px;">Published</span>`
+        : `<span style="background:rgba(245,158,11,0.15);color:#fbbf24;padding:2px 8px;border-radius:20px;font-size:11px;">Draft</span>`;
+
+      return `
+        <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:10px 12px;font-weight:600;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeH(idea.title)}</td>
+          <td style="padding:10px 12px;color:var(--text2);">${escapeH(idea.author_name)}</td>
+          <td style="padding:10px 12px;text-align:center;color:var(--text3);">${escapeH(idea.category)}</td>
+          <td style="padding:10px 12px;text-align:center;">${statusBadge}</td>
+          <td style="padding:10px 12px;text-align:center;color:var(--text3);"><i class="fa-solid fa-eye"></i> ${idea.views}</td>
+          <td style="padding:10px 12px;text-align:center;color:var(--text3);"><i class="fa-solid fa-heart" style="color:#f87171;"></i> ${idea.like_count}</td>
+          <td style="padding:10px 12px;text-align:center;">
+            <div style="display:flex;gap:6px;justify-content:center;">
+              <button onclick="toggleIdeaStatus(${idea.id}, '${idea.status}')" class="btn btn-sm" style="font-size:11px;padding:3px 8px;background:rgba(108,99,255,0.15);color:var(--accent2);border:1px solid rgba(108,99,255,0.3);">
+                ${idea.status === 'published' ? 'Unpublish' : 'Publish'}
+              </button>
+              <button onclick="adminDeleteIdea(${idea.id}, '${escapeH(idea.title)}')" class="btn btn-sm btn-danger" style="font-size:11px;padding:3px 8px;">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function filterIdeas(query) {
+    const q = query.toLowerCase();
+    renderIdeas(allIdeas.filter(i => i.title.toLowerCase().includes(q) || i.author_name.toLowerCase().includes(q)));
+  }
+
+  /* ── Tab switching ── */
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.admin-tab').forEach(t => {
+      t.style.background = 'transparent';
+      t.style.color = 'var(--text2)';
+      t.style.fontWeight = '400';
+    });
+    btn.style.background = 'var(--accent-grad)';
+    btn.style.color = '#fff';
+    btn.style.fontWeight = '600';
+
+    document.getElementById('tab-users').style.display = tab === 'users' ? 'block' : 'none';
+    document.getElementById('tab-ideas').style.display = tab === 'ideas' ? 'block' : 'none';
+
+    if (tab === 'ideas') loadIdeas();
+  }
+
+  /* ── Actions ── */
+  async function toggleBan(userId, name, isBanned) {
+    if (!confirm(`${isBanned ? 'Unban' : 'Ban'} ${name}?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/users/${userId}/ban`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) { allUsers = []; await loadUsers(); loadStats(); }
+    } catch (err) { alert('Error occurred.'); }
+  }
+
+  async function toggleAdmin(userId, name, isAdmin) {
+    if (!confirm(`${isAdmin ? 'Revoke admin from' : 'Make'} ${name} ${isAdmin ? '' : 'an admin'}?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/users/${userId}/toggle-admin`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) { allUsers = []; await loadUsers(); }
+    } catch (err) { alert('Error occurred.'); }
+  }
+
+  async function deleteUser(userId, name) {
+    if (!confirm(`Permanently delete user "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) { allUsers = []; await loadUsers(); loadStats(); }
+    } catch (err) { alert('Error occurred.'); }
+  }
+
+  async function toggleIdeaStatus(ideaId, currentStatus) {
+    try {
+      const res = await fetch(`${API_BASE}/admin/ideas/${ideaId}/toggle-status`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) { allIdeas = []; await loadIdeas(); loadStats(); }
+    } catch (err) { alert('Error occurred.'); }
+  }
+
+  async function adminDeleteIdea(ideaId, title) {
+    if (!confirm(`Delete idea "${title}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/ideas/${ideaId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) { allIdeas = []; await loadIdeas(); loadStats(); }
+    } catch (err) { alert('Error occurred.'); }
+  }
+
+  function escapeH(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+</script>
+</body>
+</html>

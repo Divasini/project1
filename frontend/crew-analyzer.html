@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Deep Analysis | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .agent-card { border-left: 3px solid var(--accent); transition: all 0.3s; }
+    .agent-card.active { border-left-color: #34d399; background: rgba(52,211,153,0.05); }
+    .agent-card.done { border-left-color: #6366f1; opacity: 0.7; }
+    .agent-icon { width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0; }
+    .score-bar { height:8px;border-radius:4px;background:var(--border);overflow:hidden; }
+    .score-bar-fill { height:100%;border-radius:4px;transition:width 1s ease; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .pulsing { animation: pulse 1.5s infinite; }
+  </style>
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <div class="nav-menu" id="mobile-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="ideas.html"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+      <a href="ai-analyzer.html"><i class="fa-solid fa-robot"></i> Quick Analyze</a>
+      <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <a href="login.html" class="login-btn">Login</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+      <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
+      <a href="messages.html" class="messages-nav-icon" title="Messages"><i class="fa-solid fa-comments"></i></a>
+    </div>
+  </div>
+</nav>
+
+<div class="container section">
+
+  <!-- HEADER -->
+  <div class="glass-card mb-4" style="background:rgba(108,99,255,0.06);border-color:var(--border2);">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="width:56px;height:56px;border-radius:16px;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;color:#fff;"><i class="fa-solid fa-brain"></i></div>
+      <div style="flex:1;">
+        <h3 style="margin:0;margin-bottom:4px;">CrewAI Deep Analysis</h3>
+        <p class="muted" style="margin:0;font-size:13px;">5 specialized AI agents analyze your startup idea from every angle — market, validation, competition, business strategy, and investment readiness.</p>
+      </div>
+      <div style="text-align:right;">
+        <span style="background:var(--accent-grad);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;"><i class="fa-solid fa-bolt"></i> Powered by CrewAI + Claude</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- LEFT: FORM -->
+    <div class="col-lg-4">
+      <div class="glass-card" style="position:sticky;top:80px;">
+        <h5 style="margin-bottom:16px;"><i class="fa-solid fa-clipboard-list"></i> Your Idea</h5>
+
+        <div id="form-msg" style="display:none;padding:10px;border-radius:10px;font-size:13px;margin-bottom:12px;text-align:center;"></div>
+
+        <div class="mb-3">
+          <label>Title *</label>
+          <input class="form-control" id="c-title" placeholder="e.g. AI Resume Builder">
+        </div>
+        <div class="mb-3">
+          <label>Category *</label>
+          <select class="form-control" id="c-category">
+            <option value="">Select</option>
+            <option>AI & Tech</option><option>Education</option><option>Finance</option>
+            <option>Healthcare</option><option>E-Commerce</option><option>Green & Sustainability</option>
+            <option>Marketplace</option><option>Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label>Problem *</label>
+          <textarea class="form-control" id="c-problem" rows="3" placeholder="What problem are you solving?"></textarea>
+        </div>
+        <div class="mb-3">
+          <label>Solution *</label>
+          <textarea class="form-control" id="c-solution" rows="3" placeholder="How does your idea solve it?"></textarea>
+        </div>
+        <div class="mb-3">
+          <label>Target Audience</label>
+          <input class="form-control" id="c-target" placeholder="e.g. Students, SMBs">
+        </div>
+        <div class="mb-3">
+          <label>Revenue Model</label>
+          <input class="form-control" id="c-revenue" placeholder="e.g. SaaS ₹299/month">
+        </div>
+        <div class="mb-3">
+          <label>Tech Stack</label>
+          <input class="form-control" id="c-tech" placeholder="e.g. React, FastAPI, AI">
+        </div>
+
+        <button class="btn btn-primary w-100" id="crew-btn" onclick="runCrewAnalysis()" style="padding:12px;">
+          <i class="fa-solid fa-brain"></i> Run Deep Analysis
+        </button>
+        <p class="muted" style="font-size:11px;text-align:center;margin-top:8px;"><i class="fa-solid fa-hourglass-half"></i> Takes 60-90 seconds. 5 AI agents working in sequence.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: AGENTS + RESULTS -->
+    <div class="col-lg-8">
+
+      <!-- AGENTS STATUS -->
+      <div class="glass-card mb-4" id="agents-panel">
+        <h6 style="color:var(--text3);font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">AI Agent Team</h6>
+        <div style="display:flex;flex-direction:column;gap:10px;" id="agents-list">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div id="empty-state" class="glass-card" style="text-align:center;padding:60px 24px;">
+        <div style="font-size:64px;margin-bottom:16px;opacity:0.5;"><i class="fa-solid fa-robot"></i></div>
+        <h4 style="color:var(--text2);margin-bottom:8px;">5 AI Agents Ready</h4>
+        <p class="muted">Fill in your idea and click "Run Deep Analysis" to deploy all 5 agents simultaneously.</p>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="results-state" style="display:none;">
+
+        <!-- OVERALL SCORE -->
+        <div class="glass-card mb-4" style="background:rgba(108,99,255,0.06);">
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+            <div style="text-align:center;flex-shrink:0;">
+              <div style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;flex-shrink:0;" id="score-circle">—</div>
+              <p class="muted" style="font-size:11px;margin-top:6px;">Overall Score</p>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+                <h4 id="r-title" style="margin:0;"></h4>
+                <span id="r-readiness" style="font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;"></span>
+              </div>
+              <p id="r-summary" class="muted" style="font-size:13px;line-height:1.6;margin:0;"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCORE BREAKDOWN -->
+        <div class="glass-card mb-4">
+          <h6 style="color:var(--text3);font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">Score Breakdown</h6>
+          <div id="score-breakdown"></div>
+        </div>
+
+        <!-- 4 DETAIL CARDS -->
+        <div class="row g-3 mb-4" id="detail-cards"></div>
+
+        <!-- RECOMMENDATIONS -->
+        <div class="glass-card mb-4" style="border-left:3px solid #60a5fa;">
+          <h6 style="color:#60a5fa;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;"><i class="fa-solid fa-lightbulb"></i> Top 5 AI Recommendations</h6>
+          <ol style="padding-left:20px;margin:0;display:flex;flex-direction:column;gap:10px;" id="recommendations-list"></ol>
+        </div>
+
+        <!-- CTA -->
+        <div class="glass-card" style="text-align:center;padding:28px;">
+          <h5 style="margin-bottom:8px;">Ready to share your idea?</h5>
+          <p class="muted" style="font-size:13px;margin-bottom:20px;">Submit it to StartupSphere and connect with investors and co-founders.</p>
+          <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+            <a href="submit-idea.html" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Submit Your Idea</a>
+            <button onclick="resetCrew()" class="btn" style="background:var(--card);border:1px solid var(--border);color:var(--text2);">Analyze Another</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script>
+  const API_BASE = "http://localhost:8000";
+  const token = localStorage.getItem('ss_token');
+
+  if (!token) window.location.href = 'login.html';
+
+  const agents = [
+    { id: 'market',    icon: 'fa-magnifying-glass', name: 'Market Research Agent',    desc: 'Calculating TAM/SAM/SOM & market trends' },
+    { id: 'validator', icon: 'fa-lightbulb', name: 'Idea Validator Agent',      desc: 'Checking problem-solution fit & UVP' },
+    { id: 'competitor',icon: 'fa-trophy', name: 'Competitor Scout Agent',    desc: 'Mapping competitive landscape' },
+    { id: 'business',  icon: 'fa-chart-simple', name: 'Business Analyst Agent',    desc: 'Analyzing revenue model & GTM strategy' },
+    { id: 'writer',    icon: 'fa-pen', name: 'Report Writer Agent',        desc: 'Synthesizing final investor report' },
+  ];
+
+  // Render agents panel
+  function renderAgents(activeIdx = -1) {
+    document.getElementById('agents-list').innerHTML = agents.map((a, i) => {
+      const isDone   = activeIdx > i;
+      const isActive = activeIdx === i;
+      const cardClass = isDone ? 'done' : isActive ? 'active' : '';
+      const statusIcon = isDone
+        ? '<i class="fa-solid fa-circle-check" style="color:#34d399;"></i>'
+        : isActive
+          ? '<span class="pulsing"><i class="fa-solid fa-gear"></i></span>'
+          : '<i class="fa-solid fa-pause" style="color:var(--text3);"></i>';
+      const bgColor = isDone ? 'rgba(99,102,241,0.1)' : isActive ? 'rgba(52,211,153,0.08)' : 'var(--card)';
+
+      return `
+        <div class="glass-card agent-card ${cardClass}" style="padding:12px 16px;background:${bgColor};">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="agent-icon" style="background:${isActive ? 'rgba(52,211,153,0.15)' : 'var(--card)'};"><i class="fa-solid ${a.icon}"></i></div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);">${a.name}</div>
+              <div style="font-size:12px;color:var(--text3);">${isActive ? `<span class="pulsing">${a.desc}...</span>` : isDone ? '<span style="color:#34d399;">Analysis complete</span>' : a.desc}</div>
+            </div>
+            <div style="font-size:18px;">${statusIcon}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderAgents(); // Initial render
+
+  function showFormMsg(text, type) {
+    const box = document.getElementById('form-msg');
+    box.textContent = text;
+    box.style.display = 'block';
+    box.style.background = type === 'error' ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)';
+    box.style.color = type === 'error' ? '#f87171' : '#34d399';
+    box.style.border = `1px solid ${type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`;
+  }
+
+  async function runCrewAnalysis() {
+    const title    = document.getElementById('c-title').value.trim();
+    const category = document.getElementById('c-category').value;
+    const problem  = document.getElementById('c-problem').value.trim();
+    const solution = document.getElementById('c-solution').value.trim();
+    const target   = document.getElementById('c-target').value.trim();
+    const revenue  = document.getElementById('c-revenue').value.trim();
+    const tech     = document.getElementById('c-tech').value.trim();
+
+    if (!title || !category || !problem || !solution) {
+      showFormMsg('Please fill in Title, Category, Problem and Solution.', 'error');
+      return;
+    }
+
+    document.getElementById('form-msg').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('results-state').style.display = 'none';
+
+    const btn = document.getElementById('crew-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Agents Working...';
+
+    // Simulate agent progress (real backend processes sequentially)
+    let agentStep = 0;
+    renderAgents(0);
+    const agentTimer = setInterval(() => {
+      agentStep = Math.min(agentStep + 1, agents.length - 1);
+      renderAgents(agentStep);
+    }, 15000); // ~15s per agent
+
+    try {
+      const res = await fetch(`${API_BASE}/ai/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, category, problem, solution, target, revenue_model: revenue, tech_stack: tech })
+      });
+
+      clearInterval(agentTimer);
+      renderAgents(agents.length); // All done
+
+      const data = await res.json();
+      if (!res.ok) {
+        showFormMsg(data.detail || 'Analysis failed. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-brain"></i> Run Deep Analysis';
+        return;
+      }
+
+      renderResults(title, data.report);
+
+    } catch (err) {
+      clearInterval(agentTimer);
+      showFormMsg('Could not connect to server. Is the backend running?', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-brain"></i> Run Deep Analysis';
+      renderAgents(-1);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-brain"></i> Run Deep Analysis';
+  }
+
+  function renderResults(title, r) {
+    document.getElementById('results-state').style.display = 'block';
+    document.getElementById('results-state').scrollIntoView({ behavior: 'smooth' });
+
+    // Overall score
+    const score = r.overall_score || 0;
+    const scoreColor = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
+    const circle = document.getElementById('score-circle');
+    circle.textContent = score;
+    circle.style.background = `conic-gradient(${scoreColor} ${score}%, var(--card) 0%)`;
+
+    document.getElementById('r-title').textContent = title;
+
+    const readiness = r.investment_readiness || 'Not ready';
+    const readinessEl = document.getElementById('r-readiness');
+    readinessEl.textContent = readiness;
+    readinessEl.style.background = readiness === 'Seed' ? 'rgba(52,211,153,0.15)' :
+                                    readiness === 'Pre-seed' ? 'rgba(251,191,36,0.15)' : 'rgba(239,68,68,0.15)';
+    readinessEl.style.color = readiness === 'Seed' ? '#34d399' :
+                              readiness === 'Pre-seed' ? '#fbbf24' : '#f87171';
+
+    document.getElementById('r-summary').textContent = r.executive_summary || '';
+
+    // Score breakdown
+    const scores = [
+      { label: 'Market Opportunity',  score: (r.market?.opportunity_score || 0) * 10,  color: '#a78bfa' },
+      { label: 'Problem-Solution Fit', score: (r.validation?.overall_score || 0) * 10, color: '#34d399' },
+      { label: 'Business Viability',  score: (r.business?.viability_score || 0) * 10,  color: '#60a5fa' },
+    ];
+    document.getElementById('score-breakdown').innerHTML = scores.map(s => `
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;">
+          <span style="color:var(--text2);">${s.label}</span>
+          <span style="font-weight:700;color:${s.color};">${s.score}/100</span>
+        </div>
+        <div class="score-bar">
+          <div class="score-bar-fill" style="width:${s.score}%;background:${s.color};"></div>
+        </div>
+      </div>
+    `).join('');
+
+    // Detail cards
+    const cards = [
+      {
+        icon: 'fa-magnifying-glass', title: 'Market Analysis', color: '#a78bfa',
+        content: `
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+            ${['TAM','SAM','SOM'].map((k,i) => `
+              <div style="background:var(--card);border-radius:10px;padding:10px 14px;flex:1;min-width:80px;text-align:center;">
+                <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${k}</div>
+                <div style="font-size:13px;font-weight:700;color:var(--text);">${[r.market?.tam, r.market?.sam, r.market?.som][i] || '—'}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Key Trends:</div>
+          ${(r.market?.trends || []).map(t => `<div style="font-size:13px;color:var(--text2);margin-bottom:4px;">• ${t}</div>`).join('')}
+        `
+      },
+      {
+        icon: 'fa-lightbulb', title: 'Idea Validation', color: '#34d399',
+        content: `
+          <div style="margin-bottom:10px;">
+            ${[
+              { label: 'Problem Severity', val: r.validation?.problem_score },
+              { label: 'Solution Fit',     val: r.validation?.solution_score },
+              { label: 'Audience Clarity', val: r.validation?.audience_score },
+            ].map(s => `
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                <span style="color:var(--text2);">${s.label}</span>
+                <span style="font-weight:700;color:#34d399;">${s.val || 0}/10</span>
+              </div>
+            `).join('')}
+          </div>
+          <div style="font-size:12px;color:#34d399;margin-bottom:4px;">Strengths:</div>
+          ${(r.validation?.strengths || []).map(s => `<div style="font-size:13px;color:var(--text2);margin-bottom:3px;"><i class="fa-solid fa-check" style="color:#34d399;"></i> ${s}</div>`).join('')}
+        `
+      },
+      {
+        icon: 'fa-trophy', title: 'Competition', color: '#fbbf24',
+        content: `
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Direct Competitors:</div>
+            ${(r.competition?.direct_competitors || []).map(c => `<div style="font-size:13px;color:var(--text2);margin-bottom:3px;">• ${c}</div>`).join('')}
+          </div>
+          <div style="margin-bottom:8px;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Threat Level:</div>
+            <span style="padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(251,191,36,0.15);color:#fbbf24;">${r.competition?.threat_level || '—'}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Your Edge:</div>
+          <div style="font-size:13px;color:var(--text2);">${r.competition?.competitive_advantage || '—'}</div>
+        `
+      },
+      {
+        icon: 'fa-chart-simple', title: 'Business Strategy', color: '#60a5fa',
+        content: `
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Go-To-Market Steps:</div>
+            ${(r.business?.gtm_steps || []).map((s,i) => `<div style="font-size:13px;color:var(--text2);margin-bottom:4px;"><span style="color:#60a5fa;font-weight:700;">${i+1}.</span> ${s}</div>`).join('')}
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Key KPIs:</div>
+            ${(r.business?.kpis || []).map(k => `<div style="font-size:13px;color:var(--text2);margin-bottom:3px;"><i class="fa-solid fa-chart-line" style="color:#60a5fa;"></i> ${k}</div>`).join('')}
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3);">Funding: <span style="color:#60a5fa;font-weight:600;">${r.business?.funding_needed || '—'}</span></div>
+        `
+      },
+    ];
+
+    document.getElementById('detail-cards').innerHTML = cards.map(card => `
+      <div class="col-md-6">
+        <div class="glass-card h-100" style="border-left:3px solid ${card.color};">
+          <h6 style="color:${card.color};font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;"><i class="fa-solid ${card.icon}"></i> ${card.title}</h6>
+          ${card.content}
+        </div>
+      </div>
+    `).join('');
+
+    // Recommendations
+    document.getElementById('recommendations-list').innerHTML = (r.recommendations || []).map(rec =>
+      `<li style="font-size:13px;color:var(--text2);line-height:1.6;">${rec}</li>`
+    ).join('');
+  }
+
+  function resetCrew() {
+    document.getElementById('results-state').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'block';
+    renderAgents(-1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

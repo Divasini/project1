@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Idea | StartupSphere</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── AI Analysis styles ── */
+    .score-ring {
+      width:120px;height:120px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:34px;font-weight:800;position:relative;
+      background:conic-gradient(var(--accent) 0%, var(--card) 0%);
+      transition: background 1s ease;
+    }
+    .score-ring::before {
+      content:'';position:absolute;inset:9px;
+      border-radius:50%;background:var(--bg2);
+    }
+    .score-ring span { position:relative;z-index:1; }
+    .score-bar { height:9px;border-radius:4px;background:var(--border);overflow:hidden; }
+    .score-bar-fill { height:100%;border-radius:4px;transition:width 1.2s ease; }
+    .swot-box { border-radius:14px;padding:22px;font-size:16.5px; }
+    .ai-list-item { display:flex;gap:10px;font-size:16.5px;color:var(--text2);margin-bottom:11px;line-height:1.6; }
+    @keyframes ai-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .ai-pulse { animation:ai-pulse 1.5s infinite; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    .slide-up { animation:slideUp 0.5s ease both; }
+    .agent-step { display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--card);border:1px solid var(--border);font-size:13px;transition:all 0.3s; }
+    .agent-step.active { border-color:var(--accent);background:rgba(108,99,255,0.08); }
+    .agent-step.done { border-color:#34d399;background:rgba(52,211,153,0.06);opacity:0.8; }
+  </style>
+</head>
+<body data-theme="dark">
+
+<nav class="navbar premium-nav">
+  <div class="container">
+    <a class="logo" href="index.html"><i class="fa-solid fa-rocket"></i> StartupSphere</a>
+    <button class="hamburger-btn" onclick="toggleMobileNav(this)"><i class="fa-solid fa-bars"></i></button>
+    <div class="nav-menu" id="mobile-nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="ideas.html"><i class="fa-solid fa-lightbulb"></i> Ideas</a>
+      <a href="forum.html"><i class="fa-solid fa-users"></i> Community</a>
+      <a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <a href="login.html" class="login-btn">Login</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+      <button onclick="toggleTheme()" class="btn btn-dark theme-toggle-btn"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container section d-flex justify-content-center">
+  <div style="width:100%;max-width:700px;transition:max-width 0.4s ease;" id="form-width-wrap">
+
+    <!-- ── SUBMIT FORM ── -->
+    <div class="glass-card" id="submit-form-card" style="animation:fadeUp 0.6s ease both;">
+
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="font-size:42px;margin-bottom:10px;" id="form-emoji"><i class="fa-solid fa-lightbulb"></i></div>
+        <h2 style="font-size:24px;margin-bottom:6px;" id="form-title">Submit Your Idea</h2>
+        <p class="muted" id="form-subtitle">Share it with 15,000+ innovators.</p>
+      </div>
+
+      <!-- MESSAGE BOX -->
+      <div id="form-message" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;text-align:center;"></div>
+
+      <!-- TITLE -->
+      <div class="mb-3">
+        <label>Idea Title *</label>
+        <input type="text" class="form-control" id="idea-title" placeholder="e.g. AI-powered Resume Builder" required>
+      </div>
+
+      <!-- CATEGORY -->
+      <div class="mb-3">
+        <label>Category *</label>
+        <select class="form-control" id="idea-category" required>
+          <option value="">Select a category</option>
+          <option value="AI">AI & Tech</option>
+          <option value="Education">Education</option>
+          <option value="Finance">Finance</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="E-Commerce">E-Commerce</option>
+          <option value="Green">Green & Sustainability</option>
+          <option value="Marketplace">Marketplace</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <!-- SHORT DESCRIPTION -->
+      <div class="mb-3">
+        <label>Short Description * <span class="muted" style="font-size:12px;">(Public — everyone sees this)</span></label>
+        <textarea class="form-control" id="idea-summary" rows="2" placeholder="One or two lines — what is your idea about?" required></textarea>
+      </div>
+
+      <!-- FULL DETAILS TOGGLE -->
+      <div class="mb-3">
+        <label style="display:flex;justify-content:space-between;align-items:center;">
+          Full Details <span class="muted" style="font-size:11px;"><i class="fa-solid fa-lock"></i> Private until access granted</span>
+          <button type="button" id="toggle-details-btn" onclick="toggleDetails()" style="background:none;border:none;color:var(--accent2);font-size:12px;cursor:pointer;font-weight:600;">+ Add full details</button>
+        </label>
+      </div>
+
+      <div id="full-details-section" style="display:none;">
+        <div class="mb-3">
+          <label>Problem Statement</label>
+          <textarea class="form-control" id="idea-problem" rows="2" placeholder="What problem are you solving?"></textarea>
+        </div>
+        <div class="mb-3">
+          <label>Proposed Solution</label>
+          <textarea class="form-control" id="idea-solution" rows="2" placeholder="How does your idea solve it?"></textarea>
+        </div>
+        <div class="mb-3">
+          <label>Target Audience</label>
+          <input type="text" class="form-control" id="idea-target" placeholder="e.g. Students, small businesses">
+        </div>
+        <div class="mb-3">
+          <label>Revenue Model</label>
+          <input type="text" class="form-control" id="idea-revenue" placeholder="e.g. Freemium, ₹299/month">
+        </div>
+        <div class="mb-3">
+          <label>Tech Stack</label>
+          <input type="text" class="form-control" id="idea-tech" placeholder="e.g. React, Node.js, OpenAI API">
+        </div>
+      </div>
+
+      <!-- TAGS + DRAFT -->
+      <div class="mb-3">
+        <label>Tags</label>
+        <input type="text" class="form-control" id="idea-tags" placeholder="AI, SaaS, Mobile (comma separated)">
+      </div>
+      <div class="mb-3" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="save-draft" style="accent-color:var(--accent);">
+        <label for="save-draft" style="margin:0;font-size:13px;color:var(--text2);cursor:pointer;">Save as draft</label>
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button type="button" class="btn btn-primary w-100" id="submit-btn" style="padding:12px;font-size:15px;" onclick="submitIdea(this)">
+        <i class="fa-solid fa-rocket"></i> Submit Idea
+      </button>
+
+    </div>
+
+    <!-- ── AI ANALYZING STAGE ── -->
+    <div id="ai-analyzing-card" style="display:none;" class="glass-card slide-up">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:48px;margin-bottom:12px;" id="analyzing-emoji"><i class="fa-solid fa-robot"></i></div>
+        <h3 id="analyzing-title" style="margin-bottom:6px;">Analyzing Your Idea...</h3>
+        <p class="muted" id="analyzing-subtitle" style="font-size:13px;">Claude AI is reviewing your startup idea</p>
+      </div>
+
+      <!-- Agent steps -->
+      <div style="display:flex;flex-direction:column;gap:8px;" id="agent-steps">
+        <div class="agent-step" id="step-market">    <span><i class="fa-solid fa-magnifying-glass"></i></span> <span>Researching market opportunity...</span> <span id="step-market-icon" style="margin-left:auto;"><i class="fa-regular fa-circle-pause"></i></span></div>
+        <div class="agent-step" id="step-validate">  <span><i class="fa-solid fa-lightbulb"></i></span> <span>Validating problem-solution fit...</span> <span id="step-validate-icon" style="margin-left:auto;"><i class="fa-regular fa-circle-pause"></i></span></div>
+        <div class="agent-step" id="step-swot">      <span><i class="fa-solid fa-chart-column"></i></span> <span>Running SWOT analysis...</span> <span id="step-swot-icon" style="margin-left:auto;"><i class="fa-regular fa-circle-pause"></i></span></div>
+        <div class="agent-step" id="step-score">     <span><i class="fa-solid fa-star"></i></span> <span>Calculating innovation & feasibility scores...</span> <span id="step-score-icon" style="margin-left:auto;"><i class="fa-regular fa-circle-pause"></i></span></div>
+        <div class="agent-step" id="step-report">    <span><i class="fa-solid fa-file-lines"></i></span> <span>Generating AI recommendation...</span> <span id="step-report-icon" style="margin-left:auto;"><i class="fa-regular fa-circle-pause"></i></span></div>
+      </div>
+
+      <div style="margin-top:20px;text-align:center;">
+        <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+          <div id="progress-bar" style="height:100%;background:var(--accent-grad);border-radius:2px;width:0%;transition:width 0.8s ease;"></div>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:8px;" id="progress-text">Starting analysis...</p>
+      </div>
+    </div>
+
+    <!-- ── AI ANALYSIS RESULTS ── -->
+    <div id="ai-results-card" style="display:none;">
+
+      <!-- Success banner -->
+      <div class="glass-card slide-up mb-4" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.3);text-align:center;padding:20px;">
+        <div style="font-size:32px;margin-bottom:8px;color:#34d399;"><i class="fa-solid fa-circle-check"></i></div>
+        <h4 style="margin-bottom:4px;color:#34d399;">Idea Submitted Successfully!</h4>
+        <p class="muted" style="font-size:13px;margin:0;">Here's what our AI thinks about your startup idea.</p>
+      </div>
+
+      <!-- Overall Score -->
+      <div class="glass-card slide-up mb-4" style="background:rgba(108,99,255,0.06);border-color:var(--border2);">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div style="text-align:center;flex-shrink:0;">
+            <div class="score-ring" id="ai-score-ring">
+              <span id="ai-score-num" style="color:#fff;">—</span>
+            </div>
+            <p class="muted" style="font-size:12.5px;margin-top:6px;">AI Score</p>
+          </div>
+          <div style="flex:1;">
+            <h4 id="ai-idea-title-display" style="margin-bottom:8px;font-size:30px;"></h4>
+            <p id="ai-verdict" style="font-size:18px;color:var(--text2);margin:0;line-height:1.7;"></p>
+          </div>
+        </div>
+
+        <!-- Sub scores -->
+        <div class="row g-3 mt-3">
+          <div class="col-4">
+            <div style="background:var(--card);border-radius:12px;padding:18px;text-align:center;">
+              <div style="font-size:34px;font-weight:800;color:#a78bfa;" id="ai-innovation-score">—</div>
+              <div style="font-size:14.5px;color:var(--text3);margin-top:4px;">Innovation</div>
+              <div class="score-bar mt-2"><div class="score-bar-fill" id="bar-innovation" style="background:#a78bfa;width:0%;"></div></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="background:var(--card);border-radius:12px;padding:18px;text-align:center;">
+              <div style="font-size:34px;font-weight:800;color:#34d399;" id="ai-feasibility-score">—</div>
+              <div style="font-size:14.5px;color:var(--text3);margin-top:4px;">Feasibility</div>
+              <div class="score-bar mt-2"><div class="score-bar-fill" id="bar-feasibility" style="background:#34d399;width:0%;"></div></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="background:var(--card);border-radius:12px;padding:18px;text-align:center;">
+              <div style="font-size:34px;font-weight:800;color:#60a5fa;" id="ai-market-score">—</div>
+              <div style="font-size:14.5px;color:var(--text3);margin-top:4px;">Market Fit</div>
+              <div class="score-bar mt-2"><div class="score-bar-fill" id="bar-market" style="background:#60a5fa;width:0%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary + Market -->
+      <div class="row g-3 mb-3">
+        <div class="col-12">
+          <div class="glass-card slide-up" style="border-left:3px solid var(--accent);">
+            <h6 style="color:var(--accent2);font-size:15.5px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;"><i class="fa-solid fa-lightbulb"></i> Idea Summary</h6>
+            <p id="ai-idea-summary" style="font-size:17px;color:var(--text2);margin:0;line-height:1.7;"></p>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="glass-card slide-up" style="border-left:3px solid #a78bfa;">
+            <h6 style="color:#a78bfa;font-size:15.5px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;"><i class="fa-solid fa-chart-line"></i> Market Potential</h6>
+            <p id="ai-market-potential" style="font-size:17px;color:var(--text2);margin:0;line-height:1.7;"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SWOT -->
+      <div class="glass-card slide-up mb-3">
+        <h6 style="font-size:15.5px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;color:var(--text3);"><i class="fa-solid fa-chart-column"></i> SWOT Analysis</h6>
+        <div class="row g-2">
+          <div class="col-md-3 col-6">
+            <div class="swot-box" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);height:100%;">
+              <div style="font-size:13.5px;font-weight:700;color:#34d399;margin-bottom:9px;"><i class="fa-solid fa-dumbbell"></i> STRENGTHS</div>
+              <div id="ai-strengths"></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="swot-box" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);height:100%;">
+              <div style="font-size:13.5px;font-weight:700;color:#f87171;margin-bottom:9px;"><i class="fa-solid fa-triangle-exclamation"></i> WEAKNESSES</div>
+              <div id="ai-weaknesses"></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="swot-box" style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);height:100%;">
+              <div style="font-size:13.5px;font-weight:700;color:#60a5fa;margin-bottom:9px;"><i class="fa-solid fa-rocket"></i> OPPORTUNITIES</div>
+              <div id="ai-opportunities"></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="swot-box" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);height:100%;">
+              <div style="font-size:13.5px;font-weight:700;color:#fbbf24;margin-bottom:9px;"><i class="fa-solid fa-bolt"></i> THREATS</div>
+              <div id="ai-threats"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Improvements -->
+      <div class="glass-card slide-up mb-3" style="border-left:3px solid #60a5fa;">
+        <h6 style="color:#60a5fa;font-size:15.5px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;"><i class="fa-solid fa-lightbulb"></i> Suggested Improvements</h6>
+        <div id="ai-improvements"></div>
+      </div>
+
+      <!-- AI Recommendation -->
+      <div class="glass-card slide-up mb-4" style="background:rgba(108,99,255,0.08);border-color:var(--border2);">
+        <h6 style="color:var(--accent2);font-size:15.5px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;"><i class="fa-solid fa-robot"></i> AI Recommendation</h6>
+        <p id="ai-recommendation" style="font-size:18px;color:var(--text);margin:0;line-height:1.8;font-style:italic;"></p>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;">
+        <a href="ideas.html" class="btn btn-primary" style="flex:1;">Browse Ideas →</a>
+        <a href="dashboard.html" class="btn" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text2);">My Dashboard</a>
+        <button onclick="submitAnother()" class="btn" style="flex:1;background:var(--card);border:1px solid var(--border);color:var(--text2);">Submit Another</button>
+      </div>
+
+    </div><!-- end ai-results-card -->
+
+  </div>
+</div>
+
+<footer style="padding:0;">
+  <div class="container" style="padding:48px clamp(16px,4vw,40px) 24px;">
+    <div class="row g-4" style="text-align:left;">
+      <div class="col-md-4">
+        <div class="logo" style="margin-bottom:12px;"><i class="fa-solid fa-rocket"></i> StartupSphere</div>
+        <p class="muted" style="font-size:13px;line-height:1.7;">Discover innovative startup ideas, connect with founders, and build the future together.</p>
+      </div>
+      <div class="col-md-4">
+        <h6 style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">Quick Links</h6>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="index.html" style="color:var(--text2);">Home</a>
+          <a href="ideas.html" style="color:var(--text2);">Browse Ideas</a>
+          <a href="forum.html" style="color:var(--text2);">Community</a>
+          <a href="contact.html" style="color:var(--text2);">Contact Us</a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <h6 style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;">Get In Touch</h6>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text2);">
+          <a href="mailto:startupsphere001@gmail.com" style="color:var(--text2);"><i class="fa-solid fa-envelope"></i> startupsphere001@gmail.com</a>
+          <a href="tel:+916383898095" style="color:var(--text2);"><i class="fa-solid fa-phone"></i> +91 63838 98095</a>
+          <a href="https://wa.me/916383898095" target="_blank" style="color:var(--text2);"><i class="fa-brands fa-whatsapp"></i> WhatsApp Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);padding:20px;text-align:center;">
+    <p>© 2026 StartupSphere. Built for innovators <i class="fa-solid fa-rocket"></i></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/script.js"></script>
+<script>
+  const API_BASE = "http://localhost:8000";
+  const token = localStorage.getItem('ss_token');
+  if (!token) window.location.href = 'login.html';
+
+  let submittedIdeaId  = null;
+
+  // ── Edit / Prefill mode ──
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('edit');
+
+  if (params.get('prefill_title')) {
+    document.getElementById('idea-title').value    = params.get('prefill_title') || '';
+    document.getElementById('idea-category').value = params.get('prefill_category') || '';
+    document.getElementById('idea-problem').value  = params.get('prefill_problem') || '';
+    document.getElementById('idea-solution').value = params.get('prefill_solution') || '';
+    document.getElementById('idea-target').value   = params.get('prefill_target') || '';
+    document.getElementById('idea-revenue').value  = params.get('prefill_revenue') || '';
+    document.getElementById('idea-tech').value     = params.get('prefill_tech') || '';
+    document.getElementById('idea-summary').value  = params.get('prefill_problem') || '';
+    toggleDetails();
+    showMessage('<i class="fa-solid fa-wand-magic-sparkles"></i> AI-generated idea loaded! Review and submit.', 'success');
+  }
+
+  if (editId) {
+    document.getElementById('form-emoji').innerHTML     = '<i class="fa-solid fa-pen"></i>';
+    document.getElementById('form-title').textContent    = 'Edit Your Idea';
+    document.getElementById('form-subtitle').textContent = 'Update your idea details below.';
+    document.getElementById('submit-btn').innerHTML      = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+    loadIdeaForEdit(editId);
+  }
+
+  // ── Helpers ──
+  function showMessage(text, type) {
+    const box = document.getElementById('form-message');
+    box.innerHTML = text;
+    box.style.display = 'block';
+    box.style.background = type === 'error' ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)';
+    box.style.color      = type === 'error' ? '#f87171' : '#34d399';
+    box.style.border     = `1px solid ${type === 'error' ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`;
+  }
+
+  function toggleDetails() {
+    const section = document.getElementById('full-details-section');
+    const btn     = document.getElementById('toggle-details-btn');
+    const isOpen  = section.style.display === 'block';
+    section.style.display = isOpen ? 'none' : 'block';
+    btn.textContent = isOpen ? '+ Add full details' : '− Hide full details';
+  }
+
+  // ── Load for edit ──
+  async function loadIdeaForEdit(id) {
+    try {
+      const res  = await fetch(`${API_BASE}/ideas/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const idea = await res.json();
+      if (!res.ok || !idea.is_owner) { showMessage('Cannot load this idea.', 'error'); return; }
+      document.getElementById('idea-title').value    = idea.title || '';
+      document.getElementById('idea-category').value = idea.category || '';
+      document.getElementById('idea-problem').value  = idea.problem || '';
+      document.getElementById('idea-solution').value = idea.solution || '';
+      document.getElementById('idea-target').value   = idea.target || '';
+      document.getElementById('idea-revenue').value  = idea.revenue_model || '';
+      document.getElementById('idea-tech').value     = idea.tech_stack || '';
+      document.getElementById('idea-tags').value     = idea.tags || '';
+      document.getElementById('idea-summary').value  = idea.problem || '';
+      document.getElementById('save-draft').checked  = idea.status === 'draft';
+      if (idea.problem || idea.solution) toggleDetails();
+    } catch (err) { showMessage('Could not connect to server.', 'error'); }
+  }
+
+  // ── SUBMIT IDEA ──
+  async function submitIdea(btn) {
+    const title    = document.getElementById('idea-title').value.trim();
+    const category = document.getElementById('idea-category').value;
+    const summary  = document.getElementById('idea-summary').value.trim();
+    const problem  = document.getElementById('idea-problem').value.trim();
+    const solution = document.getElementById('idea-solution').value.trim();
+    const target   = document.getElementById('idea-target').value.trim();
+    const revenue  = document.getElementById('idea-revenue').value.trim();
+    const tech     = document.getElementById('idea-tech').value.trim();
+    const tags     = document.getElementById('idea-tags').value.trim();
+    const isDraft  = document.getElementById('save-draft').checked;
+
+    // Validate
+    const required = [
+      document.getElementById('idea-title'),
+      document.getElementById('idea-category'),
+      document.getElementById('idea-summary')
+    ];
+    let valid = true;
+    required.forEach(inp => {
+      if (!inp.value.trim()) {
+        inp.style.borderColor = '#ef4444';
+        inp.style.boxShadow   = '0 0 0 3px rgba(239,68,68,0.18)';
+        valid = false;
+        setTimeout(() => { inp.style.borderColor=''; inp.style.boxShadow=''; }, 2500);
+      }
+    });
+    if (!valid) { showMessage('Please fill in Title, Category and Description.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = editId ? '<i class="fa-solid fa-spinner fa-spin"></i> Saving...' : '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+    const payload = {
+      title, category,
+      problem:       problem || summary,
+      solution:      solution || 'To be defined.',
+      target, revenue_model: revenue, tech_stack: tech, tags,
+      status: isDraft ? 'draft' : 'published'
+    };
+
+    try {
+      // 1. Save idea
+      const res  = await fetch(editId ? `${API_BASE}/ideas/${editId}` : `${API_BASE}/ideas/`, {
+        method: editId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) { localStorage.clear(); window.location.href='login.html'; return; }
+        showMessage(data.detail || 'Failed. Try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = editId ? '<i class="fa-solid fa-floppy-disk"></i> Save Changes' : '<i class="fa-solid fa-rocket"></i> Submit Idea';
+        return;
+      }
+
+      const ideaId = data.id || editId;
+      submittedIdeaId = ideaId;
+
+      // 2. If draft or edit → no AI analysis, just redirect
+      if (isDraft || editId) {
+        btn.innerHTML = editId ? '<i class="fa-solid fa-circle-check"></i> Saved!' : '<i class="fa-solid fa-circle-check"></i> Submitted!';
+        btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+        setTimeout(() => { window.location.href = isDraft ? 'dashboard.html' : 'ideas.html'; }, 1200);
+        return;
+      }
+
+      // 3. Show AI analyzing stage
+      document.getElementById('submit-form-card').style.display = 'none';
+      document.getElementById('ai-analyzing-card').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 4. Run AI analysis
+      await runInlineAIAnalysis(title, category, problem || summary, solution, target, revenue, tech, ideaId);
+
+    } catch (err) {
+      showMessage('Could not connect to server. Is the backend running?', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Submit Idea';
+    }
+  }
+
+  // ── AI ANALYSIS (inline) ──
+  const agentSteps = [
+    { id: 'step-market',   iconId: 'step-market-icon',   progress: 20 },
+    { id: 'step-validate', iconId: 'step-validate-icon', progress: 40 },
+    { id: 'step-swot',     iconId: 'step-swot-icon',     progress: 60 },
+    { id: 'step-score',    iconId: 'step-score-icon',    progress: 80 },
+    { id: 'step-report',   iconId: 'step-report-icon',   progress: 95 },
+  ];
+
+  async function runInlineAIAnalysis(title, category, problem, solution, target, revenue, tech, ideaId) {
+    // Animate steps
+    let stepIdx = 0;
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const messages = ['Analyzing market opportunity...', 'Checking problem-solution fit...', 'Running SWOT analysis...', 'Scoring innovation & feasibility...', 'Writing AI recommendation...'];
+
+    const stepTimer = setInterval(() => {
+      if (stepIdx > 0) {
+        document.getElementById(agentSteps[stepIdx-1].id).classList.remove('active');
+        document.getElementById(agentSteps[stepIdx-1].id).classList.add('done');
+        document.getElementById(agentSteps[stepIdx-1].iconId).innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+      }
+      if (stepIdx < agentSteps.length) {
+        document.getElementById(agentSteps[stepIdx].id).classList.add('active');
+        document.getElementById(agentSteps[stepIdx].iconId).innerHTML = '<i class="fa-solid fa-gear ai-pulse"></i>';
+        progressBar.style.width = agentSteps[stepIdx].progress + '%';
+        progressText.textContent = messages[stepIdx];
+        stepIdx++;
+      }
+    }, 3000);
+
+    try {
+      const res = await fetch(`${API_BASE}/ai/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ title, category, problem, solution, target, revenue_model: revenue, tech_stack: tech, idea_id: ideaId })
+      });
+
+      clearInterval(stepTimer);
+
+      // Complete all steps
+      agentSteps.forEach(s => {
+        document.getElementById(s.id).classList.remove('active');
+        document.getElementById(s.id).classList.add('done');
+        document.getElementById(s.iconId).innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+      });
+      progressBar.style.width = '100%';
+      progressText.textContent = 'Analysis complete!';
+
+      const data = await res.json();
+
+      await new Promise(r => setTimeout(r, 600));
+
+      document.getElementById('ai-analyzing-card').style.display = 'none';
+
+      if (!res.ok || !data.report) {
+        // Analysis failed but idea was saved — go to ideas page
+        window.location.href = 'ideas.html';
+        return;
+      }
+
+      renderAIResults(title, data.report);
+
+    } catch (err) {
+      clearInterval(stepTimer);
+      document.getElementById('ai-analyzing-card').style.display = 'none';
+      window.location.href = 'ideas.html';
+    }
+  }
+
+  function renderAIResults(title, r) {
+    document.getElementById('form-width-wrap').style.maxWidth = '1280px';
+    document.getElementById('ai-results-card').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Score ring
+    const score = Math.min(100, Math.max(0, r.overall_score || 0));
+    const color  = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
+    const ring   = document.getElementById('ai-score-ring');
+    ring.style.background = `conic-gradient(${color} ${score}%, var(--card) 0%)`;
+    document.getElementById('ai-score-num').textContent = score;
+    document.getElementById('ai-score-num').style.color  = color;
+
+    document.getElementById('ai-idea-title-display').textContent = title;
+    document.getElementById('ai-verdict').textContent            = r.verdict || '';
+    document.getElementById('ai-idea-summary').textContent       = r.idea_summary || '';
+    document.getElementById('ai-market-potential').textContent   = r.market_potential || '';
+    document.getElementById('ai-recommendation').textContent     = r.ai_recommendation || '';
+
+    // Sub scores
+    const setScore = (id, barId, val, color) => {
+      document.getElementById(id).textContent  = (val || 0);
+      document.getElementById(id).style.color  = color;
+      setTimeout(() => { document.getElementById(barId).style.width = (val || 0) + '%'; }, 300);
+    };
+    setScore('ai-innovation-score',  'bar-innovation',  r.innovation_score,  '#a78bfa');
+    setScore('ai-feasibility-score', 'bar-feasibility', r.feasibility_score, '#34d399');
+    setScore('ai-market-score',      'bar-market',      r.market_score,      '#60a5fa');
+
+    // SWOT
+    const renderList = (id, items, icon, color) => {
+      document.getElementById(id).innerHTML = (items || []).map(i =>
+        `<div class="ai-list-item"><span style="color:${color};flex-shrink:0;">${icon}</span>${i}</div>`
+      ).join('');
+    };
+    renderList('ai-strengths',     r.strengths,    '<i class="fa-solid fa-check"></i>', '#34d399');
+    renderList('ai-weaknesses',    r.weaknesses,   '<i class="fa-solid fa-xmark"></i>', '#f87171');
+    renderList('ai-opportunities', r.opportunities,'<i class="fa-solid fa-arrow-right"></i>', '#60a5fa');
+    renderList('ai-threats',       r.threats,      '<i class="fa-solid fa-exclamation"></i>', '#fbbf24');
+
+    // Improvements
+    document.getElementById('ai-improvements').innerHTML = (r.suggested_improvements || []).map((s, i) =>
+      `<div class="ai-list-item"><span style="width:20px;height:20px;border-radius:50%;background:var(--accent-grad);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${i+1}</span>${s}</div>`
+    ).join('');
+  }
+
+  function submitAnother() {
+    document.getElementById('form-width-wrap').style.maxWidth = '700px';
+    document.getElementById('ai-results-card').style.display = 'none';
+    document.getElementById('submit-form-card').style.display = 'block';
+    // Clear form
+    ['idea-title','idea-category','idea-summary','idea-problem','idea-solution','idea-target','idea-revenue','idea-tech','idea-tags'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('full-details-section').style.display = 'none';
+    document.getElementById('toggle-details-btn').textContent = '+ Add full details';
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-rocket"></i> Submit Idea';
+    document.getElementById('submit-btn').style.background = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
