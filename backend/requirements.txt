@@ -12,3 +12,4 @@ slowapi
 anthropic
 apscheduler
 crewai
+razorpay
