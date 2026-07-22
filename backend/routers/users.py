@@ -37,7 +37,7 @@ def signup(
         name          = user_data.name,
         email         = user_data.email,
         password_hash = hash_password(user_data.password),
-        is_verified   = False
+        is_verified   = True
     )
     db.add(new_user)
     db.commit()
