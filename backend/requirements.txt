@@ -13,4 +13,4 @@ anthropic
 apscheduler
 crewai
 razorpay
-resend
+requests

@@ -1,27 +1,41 @@
 import os
-import resend
+import requests
 from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
 
-resend.api_key = os.getenv("RESEND_API_KEY")
-SMTP_FROM = os.getenv("SMTP_FROM", "StartupSphere <onboarding@resend.dev>")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL", "startupsphere001@gmail.com")
+SENDER_NAME = os.getenv("SENDER_NAME", "StartupSphere")
+
+BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> bool:
     """
-    Sends an email via Resend API. Returns True on success, False on failure.
+    Sends an email via Brevo API. Returns True on success, False on failure.
     Failures are caught and logged — they should NEVER block login/signup.
     """
     try:
-        resend.Emails.send({
-            "from": SMTP_FROM,
-            "to": [to_email],
+        headers = {
+            "accept": "application/json",
+            "api-key": BREVO_API_KEY,
+            "content-type": "application/json",
+        }
+        payload = {
+            "sender": {"name": SENDER_NAME, "email": SENDER_EMAIL},
+            "to": [{"email": to_email}],
             "subject": subject,
-            "html": html_body,
-        })
-        return True
+            "htmlContent": html_body,
+        }
+        response = requests.post(BREVO_API_URL, json=payload, headers=headers, timeout=10)
+
+        if response.status_code in (200, 201):
+            return True
+        else:
+            print(f"[EMAIL ERROR] Could not send email to {to_email}: {response.status_code} {response.text}")
+            return False
 
     except Exception as e:
         print(f"[EMAIL ERROR] Could not send email to {to_email}: {repr(e)}")
