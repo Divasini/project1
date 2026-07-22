@@ -1,40 +1,26 @@
-import smtplib
 import os
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import resend
 from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SMTP_HOST     = os.getenv("SMTP_HOST")
-SMTP_PORT     = int(os.getenv("SMTP_PORT", 587))
-SMTP_USERNAME = os.getenv("SMTP_USERNAME")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SMTP_FROM     = os.getenv("SMTP_FROM")
+resend.api_key = os.getenv("RESEND_API_KEY")
+SMTP_FROM = os.getenv("SMTP_FROM", "StartupSphere <onboarding@resend.dev>")
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> bool:
     """
-    Sends an email via Gmail SMTP. Returns True on success, False on failure.
+    Sends an email via Resend API. Returns True on success, False on failure.
     Failures are caught and logged — they should NEVER block login/signup.
     """
     try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = SMTP_FROM
-        msg["To"] = to_email
-
-        msg.attach(MIMEText(html_body, "html"))
-
-        import ssl
-        context = ssl.create_default_context()
-
-        server = smtplib.SMTP_SSL(SMTP_HOST, 465, timeout=10, context=context)
-        server.login(SMTP_USERNAME, SMTP_PASSWORD)
-        server.sendmail(SMTP_FROM, to_email, msg.as_string())
-        server.quit()
-
+        resend.Emails.send({
+            "from": SMTP_FROM,
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body,
+        })
         return True
 
     except Exception as e:
