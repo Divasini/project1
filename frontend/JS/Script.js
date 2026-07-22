@@ -273,7 +273,7 @@ function updateNavbarAuth() {
   if (navActions.querySelector('.user-menu-wrap')) return;
 
   const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  const navApiBase = "http://localhost:8000";
+  const navApiBase = "https://project1-1-ltbk.onrender.com";
   const avatarStyle = user.avatar_url
     ? `background-image:url('${navApiBase}${user.avatar_url}');background-size:cover;background-position:center;`
     : 'background:var(--accent-grad);';
@@ -350,7 +350,7 @@ function escapeHtmlNav(str) {
 
 /* ── USER SEARCH ICON (injected into navbar on every page) ── */
 (function () {
-  const API_BASE_SEARCH = "http://localhost:8000";
+  const API_BASE_SEARCH = "https://project1-1-ltbk.onrender.com";
 
   document.addEventListener('DOMContentLoaded', () => {
     const navActions = document.querySelector('.nav-actions');

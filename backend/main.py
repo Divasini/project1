@@ -87,5 +87,5 @@ async def startup_event():
 def root():
     return {
         "message": "StartupSphere API is running!",
-        "docs":    "http://localhost:8000/docs"
+        "docs":    "https://project1-1-ltbk.onrender.com/docs"
     }
