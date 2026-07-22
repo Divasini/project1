@@ -55,33 +55,29 @@
     <div class="col-md-3">
       <div class="glass-card text-center" data-reveal>
         <div style="font-size:26px;margin-bottom:8px;"><i class="fa-solid fa-lightbulb" style="color:var(--accent2);"></i></div>
-        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">24</h2>
+        <h2 id="stat-ideas" style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">–</h2>
         <p class="muted" style="font-size:13px;">Ideas Posted</p>
-        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +3 this month</span>
       </div>
     </div>
     <div class="col-md-3">
       <div class="glass-card text-center" data-reveal>
         <div style="font-size:26px;margin-bottom:8px;"><i class="fa-solid fa-thumbs-up" style="color:#3b82f6;"></i></div>
-        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">1.2K</h2>
+        <h2 id="stat-likes" style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">–</h2>
         <p class="muted" style="font-size:13px;">Total Likes</p>
-        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +84 this week</span>
       </div>
     </div>
     <div class="col-md-3">
       <div class="glass-card text-center" data-reveal>
         <div style="font-size:26px;margin-bottom:8px;"><i class="fa-solid fa-eye" style="color:var(--accent2);"></i></div>
-        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">18K</h2>
+        <h2 id="stat-views" style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">–</h2>
         <p class="muted" style="font-size:13px;">Profile Views</p>
-        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +1.2K this month</span>
       </div>
     </div>
     <div class="col-md-3">
       <div class="glass-card text-center" data-reveal>
         <div style="font-size:26px;margin-bottom:8px;"><i class="fa-regular fa-comment" style="color:var(--accent2);"></i></div>
-        <h2 style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">145</h2>
+        <h2 id="stat-comments" style="font-size:32px;font-weight:900;background:var(--hero-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">–</h2>
         <p class="muted" style="font-size:13px;">Comments</p>
-        <span style="font-size:11px;color:#10b981;"><i class="fa-solid fa-arrow-up"></i> +12 today</span>
       </div>
     </div>
   </div>
@@ -140,19 +136,19 @@
           <div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;">This Week</div>
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
             <div style="text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:var(--text);">+240</div>
+              <div id="week-views" style="font-size:20px;font-weight:800;color:var(--text);">–</div>
               <div style="font-size:11px;color:var(--text3);">Views</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:var(--text);">+84</div>
+              <div id="week-likes" style="font-size:20px;font-weight:800;color:var(--text);">–</div>
               <div style="font-size:11px;color:var(--text3);">Likes</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:var(--text);">+12</div>
+              <div id="week-comments" style="font-size:20px;font-weight:800;color:var(--text);">–</div>
               <div style="font-size:11px;color:var(--text3);">Comments</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:#10b981;">+3</div>
+              <div id="week-followers" style="font-size:20px;font-weight:800;color:#10b981;">–</div>
               <div style="font-size:11px;color:var(--text3);">Followers</div>
             </div>
           </div>
@@ -283,6 +279,30 @@
     Green: 'fa-leaf', Marketplace: 'fa-store', 'E-Commerce': 'fa-bag-shopping', Other: 'fa-lightbulb'
   };
 
+  /* ── Format big numbers like 1.2K, 18K ── */
+  function formatCountDash(n) {
+    n = n || 0;
+    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return String(n);
+  }
+
+  /* ── Render the 4 top stat cards from REAL data (no more hardcoded numbers) ── */
+  function renderStatCards(data) {
+    // Prefer totals the backend sends directly; fall back to summing recent_ideas
+    const ideas = data.recent_ideas || [];
+
+    const ideasCount   = (typeof data.total_ideas === 'number') ? data.total_ideas : ideas.length;
+    const likesCount   = (typeof data.total_likes === 'number') ? data.total_likes : ideas.reduce((s, i) => s + (i.like_count || 0), 0);
+    const viewsCount   = (typeof data.total_views === 'number') ? data.total_views : ideas.reduce((s, i) => s + (i.views || 0), 0);
+    const commentsCount = (typeof data.total_comments === 'number') ? data.total_comments : ideas.reduce((s, i) => s + (i.comment_count || 0), 0);
+
+    document.getElementById('stat-ideas').textContent = formatCountDash(ideasCount);
+    document.getElementById('stat-likes').textContent = formatCountDash(likesCount);
+    document.getElementById('stat-views').textContent = formatCountDash(viewsCount);
+    document.getElementById('stat-comments').textContent = formatCountDash(commentsCount);
+  }
+
   /* ── Load Dashboard data from backend (ideas + bookmarks + notifications) ── */
   async function loadMyIdeas() {
     if (!token) return;
@@ -296,6 +316,7 @@
       myIdeasData = data.recent_ideas || [];
       renderMyIdeas();
       renderIdeaPerformance();
+      renderStatCards(data);
 
       renderBookmarks(data.bookmarked_ideas || []);
 
@@ -308,6 +329,9 @@
       document.getElementById('notif-loading').textContent = 'Could not load notifications.';
       const perfEl = document.getElementById('performance-loading');
       if (perfEl) perfEl.textContent = 'Could not load idea stats.';
+      ['stat-ideas', 'stat-likes', 'stat-views', 'stat-comments'].forEach(id => {
+        document.getElementById(id).textContent = '–';
+      });
     }
   }
 
@@ -446,6 +470,7 @@
           myIdeasData = myIdeasData.filter(i => i.id !== ideaId);
           renderMyIdeas();
           renderIdeaPerformance();
+          renderStatCards({ recent_ideas: myIdeasData });
         }, 350);
       } else {
         alert('Failed to delete idea.');
@@ -490,6 +515,7 @@
         if (item) item.status = 'published';
         renderMyIdeas();
         renderIdeaPerformance();
+        renderStatCards({ recent_ideas: myIdeasData });
       } else {
         alert('Failed to publish idea.');
         btn.textContent = 'Publish';
