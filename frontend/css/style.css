@@ -877,6 +877,28 @@ tbody tr { transition: background 0.2s ease; }
 tbody tr.hidden-row { display: none; }
 .search-highlight { background: rgba(108,99,255,0.10) !important; }
 
+/* ── 28. MESSAGES NAV ICON ──────────────────── */
+.messages-nav-icon {
+  font-size:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  transition:all 0.2s ease;
+}
+body[data-theme="dark"]  .messages-nav-icon { color:#ffffff; }
+body[data-theme="light"] .messages-nav-icon { color:#000000; }
+
+.messages-nav-icon:hover {
+  background:rgba(255,255,255,0.08);
+  transform:scale(1.08);
+}
+body[data-theme="light"] .messages-nav-icon:hover {
+  background:rgba(0,0,0,0.06);
+}
+
 /* ================================================================
    RESPONSIVE BREAKPOINTS
    ================================================================ */
@@ -898,6 +920,8 @@ tbody tr.hidden-row { display: none; }
   .col-md-4,
   .col-md-6,
   .col-md-8 { width: 100%; }
+
+  .row, .flex-container { flex-direction: column; }
 
   /* ── Navbar ── */
   .navbar .container {
@@ -1002,6 +1026,24 @@ tbody tr.hidden-row { display: none; }
   }
 }
 
+/* ── SMALL MOBILE (≤ 480px) ── */
+@media screen and (max-width: 480px) {
+  body { font-size: 14px; }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  button, input, select { width: 100%; }
+
+  .card, .box {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+}
+
 /* ── VERY SMALL PHONES (≤ 400px) ── */
 @media (max-width: 400px) {
   .hero h1 { font-size: 22px; }
@@ -1020,99 +1062,5 @@ tbody tr.hidden-row { display: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-.messages-nav-icon {
-  font-size:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  transition:all 0.2s ease;
-}
-body[data-theme="dark"]  .messages-nav-icon { color:#ffffff; }
-body[data-theme="light"] .messages-nav-icon { color:#000000; }
-
-.messages-nav-icon:hover {
-  background:rgba(255,255,255,0.08);
-  transform:scale(1.08);
-}
-body[data-theme="light"] .messages-nav-icon:hover {
-  background:rgba(0,0,0,0.06);
-}
-
-.messages-nav-icon {
-  font-size:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  transition:all 0.2s ease;
-}
-body[data-theme="dark"]  .messages-nav-icon { color:#ffffff; }
-body[data-theme="light"] .messages-nav-icon { color:#000000; }
-
-.messages-nav-icon:hover {
-  background:rgba(255,255,255,0.08);
-  transform:scale(1.08);
-}
-body[data-theme="light"] .messages-nav-icon:hover {
-  background:rgba(0,0,0,0.06);
-}
-
-/* ===== TABLET (768px and below) ===== */
-@media screen and (max-width: 768px) {
-  .container {
-    width: 100%;
-    padding: 0 15px;
-  }
-
-  /* Grid/flex layouts stack aaganum */
-  .row, .flex-container {
-    flex-direction: column;
-  }
-
-  /* Nav menu adjust */
-  nav ul {
-    flex-direction: column;
-  }
-
-  h1 { font-size: 24px; }
-  h2 { font-size: 20px; }
-}
-
-/* ===== MOBILE (480px and below) ===== */
-@media screen and (max-width: 480px) {
-  body {
-    font-size: 14px;
-  }
-
-  .container {
-    padding: 0 10px;
-  }
-
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  img, video {
-    max-width: 100%;
-    height: auto;
-  }
-
-  button, input, select {
-    width: 100%;
-  }
-
-  .card, .box {
-    width: 100%;
-    margin-bottom: 15px;
   }
 }
