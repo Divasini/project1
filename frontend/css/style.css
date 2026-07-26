@@ -925,16 +925,80 @@ body[data-theme="light"] .messages-nav-icon:hover {
 
   /* ── Navbar ── */
   .navbar .container {
-    flex-wrap: wrap;
-    padding: 10px 16px;
-    gap: 10px;
+    flex-wrap: nowrap;
+    padding: 8px 12px;
+    gap: 6px;
     position: relative;
   }
 
-  .logo { font-size: 17px; }
+  .logo {
+    font-size: 15px;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .logo i { font-size: 15px; }
 
   /* Show hamburger, hide desktop nav */
-  .hamburger-btn { display: flex !important; }
+  .hamburger-btn {
+    display: flex !important;
+    width: 32px; height: 32px;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* ── Right-side icon cluster: keep on ONE line, shrink to fit ── */
+  .nav-actions {
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  /* "Get Started" — shrink to fit; hide on very small screens (see 400px block) */
+  .nav-actions a.btn-primary {
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  /* Theme toggle circle */
+  .nav-actions .btn-dark {
+    width: 30px; height: 30px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Messages icon */
+  .nav-actions .messages-nav-icon {
+    width: 30px; height: 30px;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  /* Search icon (injected by script.js) */
+  #user-search-wrap #user-search-btn {
+    font-size: 16px;
+    padding: 0 3px;
+  }
+  #user-search-wrap #user-search-panel {
+    width: 230px;
+    right: -8px;
+  }
+
+  /* Profile / user menu (injected by script.js) — icon only, hide name */
+  .user-menu-wrap .user-menu-btn {
+    padding: 4px;
+    gap: 0;
+    border: none;
+    background: none;
+  }
+  .user-menu-wrap .user-menu-name,
+  .user-menu-wrap .user-menu-btn > span:last-child {
+    display: none;
+  }
+  .user-menu-wrap .user-menu-dropdown {
+    right: -10px;
+  }
 
   .nav-menu {
     display: none;
@@ -1052,9 +1116,16 @@ body[data-theme="light"] .messages-nav-icon:hover {
   .glass-card { padding: 14px 12px; }
   .counter { font-size: 24px; }
   .btn    { font-size: 12px; padding: 8px 13px; }
-  .nav-actions { gap: 5px; }
+  .nav-actions { gap: 3px; }
   .btn-dark { width: 34px; height: 34px; font-size: 14px; }
   .table th, .table td { font-size: 11px; padding: 8px 10px; }
+
+  /* Navbar: drop "Get Started" text button, keep icons only, so everything fits one line */
+  .nav-actions a.btn-primary { display: none; }
+  .logo { font-size: 13px; }
+  .nav-actions .btn-dark,
+  .nav-actions .messages-nav-icon { width: 28px; height: 28px; font-size: 13px; }
+  #user-search-wrap #user-search-btn { font-size: 15px; }
 }
 
 /* ── REDUCED MOTION ─────────────────────────── */

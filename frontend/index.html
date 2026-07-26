@@ -254,7 +254,7 @@
           <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);"><i class="fa-solid fa-check" style="color:#34d399;"></i> Listed in the investor feed</li>
           <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);"><i class="fa-solid fa-check" style="color:#34d399;"></i> Unlimited AI idea analysis</li>
         </ul>
-        <a href="signup.html" class="btn btn-primary w-100" style="margin-top:auto;">Upgrade To Pro <i class="fa-solid fa-sparkles"></i></a>
+        <button onclick="startPayment('pro')" class="btn btn-primary w-100" style="margin-top:auto;">Upgrade To Pro <i class="fa-solid fa-sparkles"></i></button>
       </div>
     </div>
 
@@ -275,7 +275,7 @@
           <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);"><i class="fa-solid fa-check" style="color:#34d399;"></i> Early access to new features</li>
           <li style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);"><i class="fa-solid fa-check" style="color:#34d399;"></i> Priority email support</li>
         </ul>
-        <a href="signup.html" class="btn w-100" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:700;margin-top:auto;">Go Premium <i class="fa-solid fa-star"></i></a>
+        <button onclick="startPayment('premium')" class="btn w-100" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:700;margin-top:auto;">Go Premium <i class="fa-solid fa-star"></i></button>
       </div>
     </div>
 
@@ -361,5 +361,90 @@
   }
   draw();
 </script>
+
+<!-- ================= RAZORPAY PAYMENT INTEGRATION ================= -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+const PAYMENT_API_BASE = "https://project1-1-ltbk.onrender.com";
+
+async function startPayment(plan) {
+  const token = localStorage.getItem('ss_token');
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${PAYMENT_API_BASE}/payments/create-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ plan })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.detail || 'Could not start payment. Please try again.');
+      return;
+    }
+
+    const data = await res.json();
+
+    const options = {
+      key: data.key_id,
+      amount: data.amount,
+      currency: data.currency,
+      name: "StartupSphere",
+      description: `Upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`,
+      order_id: data.order_id,
+      handler: async function (response) {
+        try {
+          const verifyRes = await fetch(`${PAYMENT_API_BASE}/payments/verify`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyRes.ok && verifyData.success) {
+            alert(verifyData.message);
+            window.location.href = 'dashboard.html';
+          } else {
+            alert(verifyData.detail || 'Payment verification failed.');
+          }
+        } catch (e) {
+          console.error(e);
+          alert('Payment succeeded but verification failed. Contact support with your payment ID: ' + response.razorpay_payment_id);
+        }
+      },
+      modal: {
+        ondismiss: function () {
+          console.log('Payment popup closed by user');
+        }
+      },
+      theme: { color: "#6c63ff" }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function (response) {
+      alert('Payment failed: ' + response.error.description);
+    });
+    rzp.open();
+
+  } catch (e) {
+    console.error(e);
+    alert('Something went wrong starting the payment. Please try again.');
+  }
+}
+</script>
+
 </body>
 </html>

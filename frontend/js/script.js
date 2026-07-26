@@ -27,6 +27,24 @@ function toggleTheme() {
 })();
 
 
+/* ── 1b. CALL-TIME RESTRICTION (shared across the whole site) ──
+   Only allow tel: dialing between 8 AM and 6 PM.
+================================================== */
+const CALL_START_HOUR = 8;   // 8 AM
+const CALL_END_HOUR   = 18;  // 6 PM
+
+function callUsNow() {
+  const now = new Date();
+  const hour = now.getHours();
+
+  if (hour >= CALL_START_HOUR && hour < CALL_END_HOUR) {
+    window.location.href = 'tel:+916383898095';
+  } else {
+    alert('Phone support is available only between 8 AM and 6 PM.\nPlease message us on WhatsApp or email instead — we\'ll get back to you soon!');
+  }
+}
+
+
 /* ── 2. MOBILE HAMBURGER MENU ────────────────── */
 function toggleMobileNav(btn) {
   const nav = document.getElementById('mobile-nav');
@@ -189,7 +207,7 @@ function addFloatingContactButton() {
       <a href="mailto:startupsphere001@gmail.com" class="fc-item" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:30px;padding:10px 16px 10px 12px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-lg);text-decoration:none;white-space:nowrap;">
         <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#9b59f5);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">✉️</span> Email Us
       </a>
-      <a href="tel:+916383898095" class="fc-item" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:30px;padding:10px 16px 10px 12px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-lg);text-decoration:none;white-space:nowrap;">
+      <a href="javascript:void(0)" onclick="callUsNow()" class="fc-item" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:30px;padding:10px 16px 10px 12px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-lg);text-decoration:none;white-space:nowrap;">
         <span style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#6c63ff);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">📞</span> Call Us
       </a>
       <a href="contact.html" class="fc-item" style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:30px;padding:10px 16px 10px 12px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-lg);text-decoration:none;white-space:nowrap;">
