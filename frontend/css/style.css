@@ -1044,7 +1044,8 @@ body[data-theme="light"] .messages-nav-icon:hover {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.5);
-    z-index: 1150;
+    z-index: 500; /* must stay BELOW .navbar's z-index (999) so the drawer, which lives
+                     inside .navbar's own stacking context, still receives taps/clicks */
   }
 
   .nav-menu-backdrop.open { display: block; }
