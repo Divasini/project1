@@ -938,13 +938,17 @@ body[data-theme="light"] .messages-nav-icon:hover {
   }
   .logo i { font-size: 15px; }
 
-  /* Show hamburger, hide desktop nav */
+  /* Show hamburger, hide desktop nav — placed at the FAR LEFT via flex order */
   .hamburger-btn {
     display: flex !important;
     width: 32px; height: 32px;
     font-size: 15px;
     flex-shrink: 0;
+    order: -2;
+    margin-right: 4px;
   }
+
+  .logo { order: -1; }
 
   /* ── Right-side icon cluster: keep on ONE line, shrink to fit ── */
   .nav-actions {
@@ -1000,25 +1004,50 @@ body[data-theme="light"] .messages-nav-icon:hover {
     right: -10px;
   }
 
+  /* ── Slide-in side drawer (off-canvas menu) ── */
   .nav-menu {
-    display: none;
-    width: 100%;
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 260px;
+    max-width: 78vw;
+    height: 100vh;
     flex-direction: column;
+    align-items: stretch;
     gap: 4px;
-    padding: 10px 0 6px;
-    border-top: 1px solid var(--border);
     margin: 0;
-    order: 99;
+    padding: 76px 14px 20px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-top: none;
+    border-right: 1px solid var(--border);
+    box-shadow: 12px 0 40px rgba(0,0,0,0.45);
+    z-index: 1200;
+    order: 0;
+    transition: left 0.35s var(--ease-out);
   }
 
-  .nav-menu.open { display: flex; }
+  .nav-menu.open { left: 0; }
 
   .nav-menu a {
     width: 100%;
-    padding: 11px 14px;
-    font-size: 14px;
+    padding: 13px 14px;
+    font-size: 15px;
     border-radius: 10px;
   }
+
+  /* Dark backdrop behind the drawer, injected by script.js */
+  .nav-menu-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1150;
+  }
+
+  .nav-menu-backdrop.open { display: block; }
 
   /* Hide login text on mobile */
   .nav-actions .login-btn { display: none; }

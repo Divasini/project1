@@ -45,12 +45,36 @@ function callUsNow() {
 }
 
 
-/* ── 2. MOBILE HAMBURGER MENU ────────────────── */
+/* ── 2. MOBILE HAMBURGER MENU (slide-in drawer) ── */
 function toggleMobileNav(btn) {
   const nav = document.getElementById('mobile-nav');
   if (!nav) return;
-  nav.classList.toggle('open');
-  btn.textContent = nav.classList.contains('open') ? '✕' : '☰';
+  const backdrop = ensureNavBackdrop();
+  const isOpen = nav.classList.toggle('open');
+  backdrop.classList.toggle('open', isOpen);
+  btn.textContent = isOpen ? '✕' : '☰';
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function ensureNavBackdrop() {
+  let backdrop = document.querySelector('.nav-menu-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'nav-menu-backdrop';
+    document.body.appendChild(backdrop);
+    backdrop.addEventListener('click', closeMobileNav);
+  }
+  return backdrop;
+}
+
+function closeMobileNav() {
+  const nav = document.getElementById('mobile-nav');
+  const btn = document.querySelector('.hamburger-btn');
+  const backdrop = document.querySelector('.nav-menu-backdrop');
+  if (nav) nav.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+  if (btn) btn.textContent = '☰';
+  document.body.style.overflow = '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,24 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileNav = document.getElementById('mobile-nav');
   if (mobileNav) {
     mobileNav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileNav.classList.remove('open');
-        const btn = document.querySelector('.hamburger-btn');
-        if (btn) btn.textContent = '☰';
-      });
+      link.addEventListener('click', closeMobileNav);
     });
   }
 
-  // Close nav when tapping outside
-  document.addEventListener('click', (e) => {
-    const nav = document.getElementById('mobile-nav');
-    const btn = document.querySelector('.hamburger-btn');
-    if (nav && nav.classList.contains('open')) {
-      if (!nav.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-        nav.classList.remove('open');
-        btn.textContent = '☰';
-      }
-    }
+  // Close nav on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileNav();
   });
 
 
